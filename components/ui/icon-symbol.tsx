@@ -1,11 +1,11 @@
 // Fallback for using MaterialIcons on Android and web.
 
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { SymbolWeight, SymbolViewProps } from 'expo-symbols';
+import { SymbolViewProps, SymbolWeight } from 'expo-symbols';
 import { ComponentProps } from 'react';
 import { OpaqueColorValue, type StyleProp, type TextStyle } from 'react-native';
 
-type IconMapping = Record<SymbolViewProps['name'], ComponentProps<typeof MaterialIcons>['name']>;
+type IconMapping = Partial<Record<SymbolViewProps['name'], ComponentProps<typeof MaterialIcons>['name']>>;
 type IconSymbolName = keyof typeof MAPPING;
 
 /**
@@ -13,12 +13,38 @@ type IconSymbolName = keyof typeof MAPPING;
  * - see Material Icons in the [Icons Directory](https://icons.expo.fyi).
  * - see SF Symbols in the [SF Symbols](https://developer.apple.com/sf-symbols/) app.
  */
-const MAPPING = {
+const MAPPING: IconMapping = {
   'house.fill': 'home',
   'paperplane.fill': 'send',
   'chevron.left.forwardslash.chevron.right': 'code',
   'chevron.right': 'chevron-right',
-} as IconMapping;
+  'moon.fill': 'nightlight-round',
+  'bell.fill': 'notifications',
+  'creditcard.fill': 'credit-card',
+  'square.grid.2x2.fill': 'category',
+  'briefcase.fill': 'work',
+  'arrow.down.doc.fill': 'file-download',
+  'trash.fill': 'delete',
+  'arrow.up.right': 'call-made',
+  'arrow.down.right': 'call-received',
+  'ellipsis.circle': 'more-vert',
+  'plus': 'add',
+  'chevron.down': 'expand-more',
+  'magnifyingglass': 'search',
+  'car.fill': 'directions-car',
+  'cross.case.fill': 'medical-services',
+  'calendar': 'calendar-today',
+  'chart.pie.fill': 'pie-chart',
+  'chart.line.uptrend.xyaxis': 'show-chart',
+  'doc.text.fill': 'article',
+  'chevron.left': 'chevron-left',
+  'arrow.right.circle.fill': 'logout',
+  'list.bullet.rectangle.fill': 'receipt-long',
+  'chart.bar.fill': 'bar-chart',
+  'gearshape.fill': 'settings',
+  'xmark.circle.fill': 'close',
+  'person.circle.fill': 'person',
+};
 
 /**
  * An icon component that uses native SF Symbols on iOS, and Material Icons on Android and web.
