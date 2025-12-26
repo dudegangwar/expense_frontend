@@ -16,40 +16,24 @@ function TransactionGroupHeader({ day, count }: { day: string; count: string }) 
   );
 }
 
-export function TransactionList() {
+export function TransactionList({ transactions }: { transactions: any[] }) {
   return (
     <View style={styles.container}>
 
       <TransactionGroupHeader day="Dec 2025" count="3 transactions" />
 
-      <TransactionItem
-        title="Transportation"
-        subtitle="tel on Sonet"
-        category="Transportation"
-        amount="-₹3,000.00"
-        date="24 Mar" // not used in new design directly but required by interface if we kept it strict
-        color="rgba(33, 150, 243, 0.1)" // Blue tint
-        icon="car.fill"
-      />
+      {transactions.map((transaction: any) => (
+        <TransactionItem
+          key={transaction.id}
+          title={transaction.notes}
+          subtitle={transaction.category_name}
+          amount={transaction.amount}
+          date={transaction.expense_date}
+          color="rgba(33, 150, 243, 0.1)"
+          icon="car.fill"
+        />
+      ))}
 
-      <TransactionItem
-        title="Healthcare"
-        subtitle="Medicine from Rinku"
-        category="Healthcare"
-        amount="-₹300.00"
-        date="24 Mar"
-        color="rgba(0, 188, 212, 0.1)" // Cyan tint
-        icon="cross.case.fill"
-      />
-
-      <TransactionItem
-        title="Primary Job"
-        category="Income"
-        amount="+₹45,000.00"
-        date="24 Mar"
-        color="rgba(103, 58, 183, 0.1)" // Purple tint
-        icon="briefcase.fill"
-      />
 
     </View>
   );

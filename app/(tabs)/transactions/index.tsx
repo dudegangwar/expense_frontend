@@ -14,7 +14,7 @@ export default function TransactionsScreen() {
 
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Transactions</Text>
-        <TouchableOpacity style={styles.addButton} onPress={() => router.push("/(tabs)/transactions/add")}>
+        <TouchableOpacity style={styles.addButton} onPress={() => router.push("/add")}>
           {/* @ts-ignore */}
           <IconSymbol name="plus" size={20} color="#5E60CE" />
         </TouchableOpacity>

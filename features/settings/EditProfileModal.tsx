@@ -17,22 +17,22 @@ interface EditProfileModalProps {
     visible: boolean;
     onClose: () => void;
     initialData: {
-        full_name: string;
+        name: string;
         email: string;
         phone_number: string;
     };
-    onSave: (data: { full_name: string; email: string; phone_number: string }) => Promise<void>;
+    onSave: (data: { name: string; email: string; phone_number: string }) => Promise<void>;
 }
 
 export function EditProfileModal({ visible, onClose, initialData, onSave }: EditProfileModalProps) {
-    const [fullName, setFullName] = useState(initialData.full_name);
+    const [fullName, setFullName] = useState(initialData.name);
     const [email, setEmail] = useState(initialData.email);
     const [phoneNumber, setPhoneNumber] = useState(initialData.phone_number);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (visible) {
-            setFullName(initialData.full_name || '');
+            setFullName(initialData.name || '');
             setEmail(initialData.email || '');
             setPhoneNumber(initialData.phone_number || '');
         }
@@ -41,7 +41,7 @@ export function EditProfileModal({ visible, onClose, initialData, onSave }: Edit
     const handleSave = async () => {
         try {
             setLoading(true);
-            await onSave({ full_name: fullName, email, phone_number: phoneNumber });
+            await onSave({ name: fullName, email, phone_number: phoneNumber });
             onClose();
         } catch (error) {
             // Error handling should be done in parent or here

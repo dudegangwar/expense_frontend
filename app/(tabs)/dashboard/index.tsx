@@ -1,22 +1,42 @@
 import { SummaryCard } from "@/components/SummaryCard";
 import { ActionButtons } from "@/features/dashboard/ActionButtons";
 import { TransactionList } from "@/features/transactions/TransactionList";
+import api from "@/lib/api/api";
+import { useEffect, useState } from "react";
 import { ScrollView, StatusBar, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+
 export default function DashboardScreen() {
+  const [transactions, setTransactions] = useState([]);
+  useEffect(() => {
+    fetchTransactions();
+  }, []);
+
+  const fetchTransactions = async () => {
+    try {
+      const response = await api.get("/expenses");
+      setTransactions(response.data);
+      console.log(response.data);
+    } catch (error) {
+      console.error("Failed to fetch transactions:", error);
+    }
+  };
+  const amountSum = transactions.reduce((total, transaction) => total + transaction.amount, 0);
+
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0B0D12" />
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <Text style={styles.appName}>Xpen</Text>
-          <Text style={styles.date}>25 Dec 2025</Text>
+          <Text style={styles.date}>{new Date().toLocaleDateString()}</Text>
         </View>
 
-        <SummaryCard />
+        <SummaryCard amountSum={amountSum} />
         <ActionButtons />
-        <TransactionList />
+        <TransactionList transactions={transactions} />
       </ScrollView>
     </SafeAreaView>
   );

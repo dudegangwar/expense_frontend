@@ -35,7 +35,7 @@ export default function RegisterScreen() {
 
             // 1. Register
             const registerRes = await api.post("/users/register", {
-                full_name: name, // Assuming API expects full_name, though prompt said "email", "password", "currency_code", "phone_number". Adjusting to prompt.
+                name: name, // Assuming API expects name, though prompt said "email", "password", "currency_code", "phone_number". Adjusting to prompt.
                 email,
                 password,
                 phone_number: phoneNumber,

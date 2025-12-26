@@ -14,4 +14,17 @@ api.interceptors.request.use(async (config) => {
   return config;
 });
 
+export interface Category {
+  id: string;
+  name: string;
+  icon: string;
+  type: 'income' | 'expense';
+  monthly_budget: number;
+}
+
+export const getCategories = async () => {
+  const response = await api.get<Category[]>("/categories");
+  return response.data;
+};
+
 export default api;

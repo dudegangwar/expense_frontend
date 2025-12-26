@@ -102,7 +102,7 @@ export default function SettingsScreen() {
     const [notifications, setNotifications] = useState(true);
 
     // User State
-    const [user, setUser] = useState<{ full_name: string; email: string; phone_number: string } | null>(null);
+    const [user, setUser] = useState<{ name: string; email: string; phone_number: string } | null>(null);
     const [loading, setLoading] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
 
@@ -126,7 +126,7 @@ export default function SettingsScreen() {
         }, [])
     );
 
-    const handleUpdateUser = async (updatedData: { full_name: string; email: string; phone_number: string }) => {
+    const handleUpdateUser = async (updatedData: { name: string; email: string; phone_number: string }) => {
         try {
             const res = await api.put('/users/me', updatedData);
             setUser(res.data); // Update local state with response
@@ -183,7 +183,7 @@ export default function SettingsScreen() {
                                 <ActivityIndicator color={THEME.accent} />
                             ) : (
                                 <>
-                                    <Text style={styles.profileName}>{user?.full_name || 'User'}</Text>
+                                    <Text style={styles.profileName}>{user?.name || 'User'}</Text>
                                     <Text style={styles.profileEmail}>{user?.email || 'email@example.com'}</Text>
                                 </>
                             )}
@@ -217,10 +217,10 @@ export default function SettingsScreen() {
                 <SettingSection title="Budget & Categories">
                     <SettingItem
                         icon="creditcard.fill"
-                        title="Monthly Budget"
+                        title="Budget"
                         subtitle="Set your monthly budget"
                         type="link"
-                        onPress={() => { }}
+                        onPress={() => router.push('/budget')}
                     />
                     <View style={styles.separator} />
                     <SettingItem
@@ -294,7 +294,7 @@ export default function SettingsScreen() {
                 visible={modalVisible}
                 onClose={() => setModalVisible(false)}
                 initialData={{
-                    full_name: user?.full_name || '',
+                    name: user?.name || '',
                     email: user?.email || '',
                     phone_number: user?.phone_number || ''
                 }}

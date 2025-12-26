@@ -1,20 +1,23 @@
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { router } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export function ActionButtons() {
     return (
         <View style={styles.container}>
-            <TouchableOpacity style={[styles.button, styles.incomeButton]}>
+            <TouchableOpacity style={[styles.button, styles.incomeButton]} onPress={() => router.push("/add")}>
                 {/* @ts-ignore */}
                 <IconSymbol name="arrow.up.right" size={20} color="#fff" />
                 <Text style={styles.buttonText}>Add Income</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={[styles.button, styles.expenseButton]}>
+            <TouchableOpacity style={[styles.button, styles.expenseButton]} onPress={() => router.push("/add")}>
                 {/* @ts-ignore */}
                 <IconSymbol name="arrow.down.right" size={20} color="#fff" />
                 <Text style={styles.buttonText}>Add Expense</Text>
             </TouchableOpacity>
+
+
         </View>
     );
 }
@@ -39,6 +42,9 @@ const styles = StyleSheet.create({
     },
     expenseButton: {
         backgroundColor: "#FD3C4A", // Red
+    },
+    budgetButton: {
+        backgroundColor: "#7F3DFF", // Purple
     },
     buttonText: {
         color: "#fff",

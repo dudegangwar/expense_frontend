@@ -11,12 +11,12 @@ interface TransactionItemProps {
 }
 
 function TransactionItem({ title, subtitle, amount, color = "#2C2C35", icon = "creditcard.fill" }: TransactionItemProps) {
-  const isPositive = amount.startsWith("+");
+  // const isPositive = amount.startsWith("+");
   return (
     <View style={styles.transaction}>
       <View style={[styles.iconContainer, { backgroundColor: color }]}>
         {/* @ts-ignore */}
-        <IconSymbol name={icon} size={20} color={isPositive ? "#4CAF50" : "#5E60CE"} />
+        <IconSymbol name={icon} size={20} color={"#5E60CE"} />
       </View>
 
       <View style={styles.transactionInfo}>
@@ -28,10 +28,10 @@ function TransactionItem({ title, subtitle, amount, color = "#2C2C35", icon = "c
         <Text
           style={[
             styles.transactionAmount,
-            { color: isPositive ? "#4CAF50" : "#FD3C4A" },
+            { color: "#FD3C4A" },
           ]}
         >
-          {amount}
+          ₹{amount}
         </Text>
       </View>
     </View>
