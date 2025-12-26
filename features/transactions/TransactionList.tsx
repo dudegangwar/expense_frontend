@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { TransactionItem } from "./TransactionItem";
 
 // Adjusted TransactionGroup to render children items
-function TransactionGroupHeader({ day, count }: { day: string; count: string }) {
+function TransactionGroupHeader({ day, count }: { day: string; count: number }) {
   return (
     <View style={styles.groupHeader}>
       <View style={styles.groupHeaderLeft}>
@@ -11,7 +11,7 @@ function TransactionGroupHeader({ day, count }: { day: string; count: string }) 
         <IconSymbol name="chevron.down" size={20} color="#5E60CE" />
         <Text style={styles.dayText}>{day}</Text>
       </View>
-      <Text style={styles.countText}>{count}</Text>
+      <Text style={styles.countText}>{count} Transactions</Text>
     </View>
   );
 }
@@ -20,7 +20,7 @@ export function TransactionList({ transactions }: { transactions: any[] }) {
   return (
     <View style={styles.container}>
 
-      <TransactionGroupHeader day="Dec 2025" count="3 transactions" />
+      <TransactionGroupHeader day="Dec 2025" count={transactions.length} />
 
       {transactions.map((transaction: any) => (
         <TransactionItem
