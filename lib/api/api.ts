@@ -2,7 +2,7 @@ import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 
 const api = axios.create({
-  baseURL: "https://expenser-two.vercel.app",
+  baseURL: "https://expenser-node.vercel.app",
   timeout: 10000,
 });
 
