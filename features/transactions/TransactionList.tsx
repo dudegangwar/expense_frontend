@@ -1,9 +1,17 @@
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { IExpenses } from "@/types";
+import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { TransactionItem } from "./TransactionItem";
 
 // Adjusted TransactionGroup to render children items
-function TransactionGroupHeader({ day, count }: { day: string; count: number }) {
+function TransactionGroupHeader({
+  day,
+  count,
+}: {
+  day: string;
+  count: number;
+}) {
   return (
     <View style={styles.groupHeader}>
       <View style={styles.groupHeaderLeft}>
@@ -16,27 +24,65 @@ function TransactionGroupHeader({ day, count }: { day: string; count: number }) 
   );
 }
 
-export function TransactionList({ transactions }: { transactions: any[] }) {
+export function TransactionList({
+  transactions,
+}: {
+  transactions: IExpenses[];
+}) {
+  const groupTransactionsByMonthAndYear = (transactions: IExpenses[]) => {
+    return transactions.reduce((acc: any, txn: IExpenses) => {
+      const date = new Date(txn.expense_date);
+      const year = date.getFullYear();
+      const month = date.toLocaleString("en-US", { month: "short" }); // Dec
+
+      const key = `${month}-${year}`;
+
+      if (!acc[key]) {
+        acc[key] = {
+          month,
+          year,
+          transactions: [],
+          totalAmount: 0,
+        };
+      }
+
+      acc[key].transactions.push(txn);
+      acc[key].totalAmount += Number(txn.amount);
+
+      return acc;
+    }, {});
+  };
+
+  const transactionGroups = groupTransactionsByMonthAndYear(transactions);
+ 
   return (
-    <View style={styles.container}>
+  <View style={styles.container}>
+    
+    {transactions.length > 0 &&
+      Object.entries(transactionGroups).map(([key, group]: [string, any]) => (
+        <React.Fragment key={key}>
+          <TransactionGroupHeader
+            day={key}
+            count={group?.transactions?.length}
+          />
 
-      <TransactionGroupHeader day="Dec 2025" count={transactions.length} />
-
-      {transactions.map((transaction: any) => (
-        <TransactionItem
-          key={transaction.id}
-          title={transaction.notes}
-          subtitle={transaction.category_name}
-          amount={transaction.amount}
-          date={transaction.expense_date}
-          color="rgba(33, 150, 243, 0.1)"
-          icon="car.fill"
-        />
+          {group.transactions.map((transaction: any) => (
+            <TransactionItem
+              key={transaction.id}
+              title={transaction.notes}
+              subtitle={transaction.category_name}
+              amount={transaction.amount}
+              date={transaction.expense_date}
+              color="rgba(33, 150, 243, 0.1)"
+              icon="car.fill"
+            />
+          ))}
+        </React.Fragment>
       ))}
+  </View>
+);
 
 
-    </View>
-  );
 }
 
 const styles = StyleSheet.create({
@@ -63,5 +109,5 @@ const styles = StyleSheet.create({
   countText: {
     color: "#A0A0A5",
     fontSize: 13,
-  }
+  },
 });

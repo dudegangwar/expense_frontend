@@ -5,6 +5,7 @@ interface TransactionItemProps {
   title: string;
   subtitle?: string;
   amount: string;
+  date?: string;
   // date is typically in the group header now, but we can keep it if needed
   color?: string; // background color for icon
   icon?: string;

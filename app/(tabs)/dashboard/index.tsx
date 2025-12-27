@@ -1,34 +1,59 @@
+import { TransactionListSkeleton } from "@/components/skeleton/TransactionList";
 import { SummaryCard } from "@/components/SummaryCard";
 import { ActionButtons } from "@/features/dashboard/ActionButtons";
 import { TransactionList } from "@/features/transactions/TransactionList";
 import api from "@/lib/api/api";
+import { IExpenses } from "@/types";
 import { useEffect, useState } from "react";
-import { ScrollView, StatusBar, StyleSheet, Text, View } from "react-native";
+import { RefreshControl, ScrollView, StatusBar, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 
 export default function DashboardScreen() {
-  const [transactions, setTransactions] = useState([]);
+  const [transactions, setTransactions] = useState<IExpenses[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
   useEffect(() => {
     fetchTransactions();
   }, []);
 
   const fetchTransactions = async () => {
     try {
+      setLoading(true);
       const response = await api.get("/expenses");
       setTransactions(response.data);
       console.log(response.data);
     } catch (error) {
       console.error("Failed to fetch transactions:", error);
+    } finally {
+      setLoading(false);
     }
   };
   const amountSum = transactions.reduce((total, transaction) => total + transaction.amount, 0);
 
+  const onRefresh = () => {
+    setRefreshing(true);
+    setTimeout(() => {
+      fetchTransactions();
+      setRefreshing(false);
+    }, 2000);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0B0D12" />
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+      contentContainerStyle={styles.scrollContent} 
+      showsVerticalScrollIndicator={false}
+      refreshControl={
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                    colors={["grey"]}
+                    progressBackgroundColor={"white"}
+                  />
+                }
+      >
         <View style={styles.header}>
           <Text style={styles.appName}>Xpen</Text>
           <Text style={styles.date}>{new Date().toLocaleDateString()}</Text>
@@ -36,7 +61,12 @@ export default function DashboardScreen() {
 
         <SummaryCard amountSum={amountSum} />
         <ActionButtons />
-        <TransactionList transactions={transactions} />
+          {loading ? (
+                    <TransactionListSkeleton />
+                  ) : (
+                    <TransactionList transactions={transactions} />
+                  )}
+
       </ScrollView>
     </SafeAreaView>
   );

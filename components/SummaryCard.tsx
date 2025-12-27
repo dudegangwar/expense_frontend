@@ -1,13 +1,36 @@
 import api from "@/lib/api/api";
 import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
-import { Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  Modal,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { IconSymbol } from "./ui/icon-symbol";
 
 // Helper for the small internal cards
-function MiniCard({ icon, label, amount, action, onPress }: { icon: string; label: string; amount?: string; action?: string; onPress?: () => void }) {
+function MiniCard({
+  icon,
+  label,
+  amount,
+  action,
+  onPress,
+}: {
+  icon: string;
+  label: string;
+  amount?: string;
+  action?: string;
+  onPress?: () => void;
+}) {
   return (
-    <TouchableOpacity style={styles.miniCard} onPress={onPress} disabled={!onPress}>
+    <TouchableOpacity
+      style={styles.miniCard}
+      onPress={onPress}
+      disabled={!onPress}
+    >
       <View style={styles.miniHeader}>
         <View style={styles.iconContainer}>
           {/* @ts-ignore */}
@@ -27,14 +50,21 @@ function MiniCard({ icon, label, amount, action, onPress }: { icon: string; labe
 export function SummaryCard({ amountSum }: { amountSum: number }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [budgetAmount, setBudgetAmount] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSave = async () => {
     console.log("Saving budget:", budgetAmount);
     try {
-      const response = await api.post("/budgets", { amount: budgetAmount, month: `${new Date().getFullYear()}-${new Date().getMonth() + 1}` });
+      setLoading(true);
+      const response = await api.post("/budgets", {
+        amount: budgetAmount,
+        month: `${new Date().getFullYear()}-${new Date().getMonth() + 1}`,
+      });
       console.log("Budget saved successfully:", response.data);
     } catch (error) {
       console.error("Error saving budget:", error);
+    } finally {
+      setLoading(false);
     }
 
     setModalVisible(false);
@@ -50,13 +80,21 @@ export function SummaryCard({ amountSum }: { amountSum: number }) {
     >
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Expenses This Month</Text>
-        <IconSymbol name="ellipsis.circle" size={20} color="rgba(255,255,255,0.7)" />
+        <IconSymbol
+          name="ellipsis.circle"
+          size={20}
+          color="rgba(255,255,255,0.7)"
+        />
       </View>
 
       <Text style={styles.totalAmount}>₹{amountSum}</Text>
 
       <View style={styles.row}>
-        <MiniCard icon="arrow.up.right" label="Income - Month" amount="₹45.0K" />
+        <MiniCard
+          icon="arrow.up.right"
+          label="Income - Month"
+          amount="₹45.0K"
+        />
         <View style={{ width: 12 }} />
         <MiniCard
           icon="creditcard.fill"
@@ -95,10 +133,13 @@ export function SummaryCard({ amountSum }: { amountSum: number }) {
               </TouchableOpacity>
 
               <TouchableOpacity
+                disabled={loading}
                 style={[styles.modalButton, styles.saveButton]}
                 onPress={handleSave}
               >
-                <Text style={styles.saveButtonText}>Save</Text>
+                <Text style={styles.saveButtonText}>
+                  {loading ? "Saving..." : "Save"}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -172,16 +213,16 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalContent: {
-    backgroundColor: '#1E1E1E',
+    backgroundColor: "#1E1E1E",
     borderRadius: 20,
     padding: 24,
-    width: '80%',
-    alignItems: 'center',
+    width: "80%",
+    alignItems: "center",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
@@ -190,42 +231,42 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#fff',
+    fontWeight: "600",
+    color: "#fff",
     marginBottom: 20,
   },
   input: {
-    width: '100%',
-    backgroundColor: '#2C2C2C',
+    width: "100%",
+    backgroundColor: "#2C2C2C",
     borderRadius: 12,
     padding: 16,
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
     marginBottom: 24,
   },
   modalButtons: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
-    width: '100%',
+    width: "100%",
   },
   modalButton: {
     flex: 1,
     paddingVertical: 12,
     borderRadius: 12,
-    alignItems: 'center',
+    alignItems: "center",
   },
   cancelButton: {
-    backgroundColor: '#333',
+    backgroundColor: "#333",
   },
   saveButton: {
-    backgroundColor: '#5E60CE',
+    backgroundColor: "#5E60CE",
   },
   cancelButtonText: {
-    color: '#fff',
-    fontWeight: '600',
+    color: "#fff",
+    fontWeight: "600",
   },
   saveButtonText: {
-    color: '#fff',
-    fontWeight: '600',
+    color: "#fff",
+    fontWeight: "600",
   },
 });
