@@ -8,6 +8,7 @@ import { IExpenses } from "@/types";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
+  Alert,
   RefreshControl,
   ScrollView,
   StatusBar,
@@ -31,9 +32,8 @@ export default function TransactionsScreen() {
       setLoading(true);
       const response = await api.get("/expenses");
       setTransactions(response.data);
-      console.log(response.data);
     } catch (error) {
-      console.error("Failed to fetch transactions:", error);
+      Alert.alert("Error", "Failed to fetch transactions");
     } finally {
       setLoading(false);
     }

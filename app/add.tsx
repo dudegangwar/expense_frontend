@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import { useTransactionStore } from "@/store/transaction";
+import React from "react";
 import {
   StyleSheet,
   View
@@ -8,13 +9,13 @@ import { Form as TransactionInput } from "../features/transactions/TransactionIn
 import { TypeToggle as TransactionTypeToggle } from "../features/transactions/TransactionTypeToggle";
 
 export default function AddTransactionScreen() {
-  const [type, setType] = useState<"expense" | "income">("expense");
+  const { expenseType, setExpenseType } = useTransactionStore();
 
   return (
     <View style={styles.container}>
       <TransactionHeader />
-      <TransactionTypeToggle type={type} setType={setType} />
-      <TransactionInput type={type} />
+      <TransactionTypeToggle type={expenseType} setType={setExpenseType} />
+      <TransactionInput type={expenseType} />
     </View>
   );
 }

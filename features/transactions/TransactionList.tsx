@@ -1,40 +1,85 @@
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { IExpenses } from "@/types";
-import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import React, { useState } from "react";
+import { LayoutAnimation, Platform, StyleSheet, Text, TouchableOpacity, UIManager, View } from "react-native";
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { TransactionItem } from "./TransactionItem";
 
-// Adjusted TransactionGroup to render children items
-function TransactionGroupHeader({
+if (Platform.OS === 'android') {
+  if (UIManager.setLayoutAnimationEnabledExperimental) {
+    UIManager.setLayoutAnimationEnabledExperimental(true);
+  }
+}
+
+function TransactionGroup({
   day,
-  count,
+  group,
 }: {
   day: string;
-  count: number;
+  group: any;
 }) {
+  const [isExpanded, setIsExpanded] = useState(true);
+  const rotate = useSharedValue(0);
+
+  const toggleExpand = () => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setIsExpanded(!isExpanded);
+    rotate.value = withTiming(isExpanded ? -90 : 0);
+  };
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ rotate: `${rotate.value}deg` }],
+    };
+  });
+
   return (
-    <View style={styles.groupHeader}>
-      <View style={styles.groupHeaderLeft}>
-        {/* @ts-ignore */}
-        <IconSymbol name="chevron.down" size={20} color="#5E60CE" />
-        <Text style={styles.dayText}>{day}</Text>
-      </View>
-      <Text style={styles.countText}>{count} Transactions</Text>
+    <View style={styles.transactionGroup}>
+      <TouchableOpacity
+        style={styles.groupHeader}
+        onPress={toggleExpand}
+        activeOpacity={0.7}
+      >
+        <View style={styles.groupHeaderLeft}>
+          <Animated.View style={animatedStyle}>
+            {/* @ts-ignore */}
+            <IconSymbol
+              name="chevron.down"
+              size={20}
+              color="#5E60CE"
+            />
+          </Animated.View>
+          <Text style={styles.dayText}>{day}</Text>
+        </View>
+        <Text style={styles.countText}>{group?.transactions?.length} Transactions</Text>
+      </TouchableOpacity>
+
+      {isExpanded && group.transactions.map((transaction: any) => (
+        <TransactionItem
+          key={transaction.id}
+          title={transaction.notes}
+          subtitle={transaction.category_name}
+          amount={transaction.amount}
+          date={transaction.expense_date}
+          color="rgba(33, 150, 243, 0.1)"
+          icon="car.fill"
+        />
+      ))}
     </View>
   );
 }
 
 export function TransactionList({
-  transactions,
+  transactions, showBy = "month"
 }: {
   transactions: IExpenses[];
+  showBy?: string;
 }) {
   const groupTransactionsByMonthAndYear = (transactions: IExpenses[]) => {
     return transactions.reduce((acc: any, txn: IExpenses) => {
       const date = new Date(txn.expense_date);
       const year = date.getFullYear();
       const month = date.toLocaleString("en-US", { month: "short" }); // Dec
-
       const key = `${month}-${year}`;
 
       if (!acc[key]) {
@@ -52,37 +97,43 @@ export function TransactionList({
       return acc;
     }, {});
   };
+  const groupTransactionsByDay = (transactions: IExpenses[]) => {
+    return transactions.reduce((acc: any, txn: IExpenses) => {
+      const date = new Date(txn.expense_date);
 
-  const transactionGroups = groupTransactionsByMonthAndYear(transactions);
- 
+      const day = date.getDate(); // 27
+      const month = date.toLocaleString("en-US", { month: "short" }); // Dec
+      const year = date.getFullYear();
+
+      const key = `${day}-${month}-${year}`;
+
+      if (!acc[key]) {
+        acc[key] = {
+          day,
+          month,
+          year,
+          transactions: [],
+          totalAmount: 0,
+        };
+      }
+
+      acc[key].transactions.push(txn);
+      acc[key].totalAmount += Number(txn.amount);
+
+      return acc;
+    }, {});
+  };
+
+
+  const transactionGroups = showBy === "month" ? groupTransactionsByMonthAndYear(transactions) : groupTransactionsByDay(transactions);
   return (
-  <View style={styles.container}>
-    
-    {transactions.length > 0 &&
-      Object.entries(transactionGroups).map(([key, group]: [string, any]) => (
-        <React.Fragment key={key}>
-          <TransactionGroupHeader
-            day={key}
-            count={group?.transactions?.length}
-          />
-
-          {group.transactions.map((transaction: any) => (
-            <TransactionItem
-              key={transaction.id}
-              title={transaction.notes}
-              subtitle={transaction.category_name}
-              amount={transaction.amount}
-              date={transaction.expense_date}
-              color="rgba(33, 150, 243, 0.1)"
-              icon="car.fill"
-            />
-          ))}
-        </React.Fragment>
-      ))}
-  </View>
-);
-
-
+    <View style={styles.container}>
+      {transactions.length > 0 &&
+        Object.entries(transactionGroups).map(([key, group]: [string, any]) => (
+          <TransactionGroup key={key} day={key} group={group} />
+        ))}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -90,6 +141,10 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     marginTop: 10,
   },
+  transactionGroup: {
+    marginBottom: 5,
+  },
+
   groupHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -103,7 +158,7 @@ const styles = StyleSheet.create({
   },
   dayText: {
     color: "#fff",
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: "700",
   },
   countText: {

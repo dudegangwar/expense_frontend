@@ -37,12 +37,11 @@ function Form({ type }: { type: "income" | "expense" }) {
   const saveTransaction = async () => {
     try {
       const response = await api.post("/expenses", {
-        amount: Number(amount),
+        amount: type === "expense" ? -Number(amount) : Number(amount),
         notes: notes,
         expense_date: date,
         category_id: selectedCategory,
         mood: Number(selectedMood),
-        // type: type,
       });
       console.log("Transaction submitted:", response.data);
       Alert.alert("Transaction submitted successfully");

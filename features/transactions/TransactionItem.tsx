@@ -12,7 +12,7 @@ interface TransactionItemProps {
 }
 
 function TransactionItem({ title, subtitle, amount, color = "#2C2C35", icon = "creditcard.fill" }: TransactionItemProps) {
-  // const isPositive = amount.startsWith("+");
+  const isNegative = amount.toString().startsWith("-");
   return (
     <View style={styles.transaction}>
       <View style={[styles.iconContainer, { backgroundColor: color }]}>
@@ -29,10 +29,10 @@ function TransactionItem({ title, subtitle, amount, color = "#2C2C35", icon = "c
         <Text
           style={[
             styles.transactionAmount,
-            { color: "#FD3C4A" },
+            { color: isNegative ? "#FD3C4A" : "#45e914ff" },
           ]}
         >
-          ₹{amount}
+          ₹{amount.toString().replace("-", "")}
         </Text>
       </View>
     </View>

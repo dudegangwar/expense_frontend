@@ -20,7 +20,7 @@ export default function DashboardScreen() {
   const fetchTransactions = async () => {
     try {
       setLoading(true);
-      const response = await api.get("/expenses");
+      const response = await api.get(`/expenses/month/${new Date().getMonth() + 1}/${new Date().getFullYear()}`);
       setTransactions(response.data);
       console.log(response.data);
     } catch (error) {
@@ -29,7 +29,16 @@ export default function DashboardScreen() {
       setLoading(false);
     }
   };
-  const amountSum = transactions.reduce((total, transaction) => total + transaction.amount, 0);
+  const amountSum = transactions.reduce(
+    (total, transaction) =>
+      transaction.amount < 0 ? total + transaction.amount : total,
+    0
+  );
+  const incomeSum = transactions.reduce(
+    (total, transaction) =>
+      transaction.amount > 0 ? total + transaction.amount : total,
+    0
+  );
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -42,30 +51,31 @@ export default function DashboardScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0B0D12" />
-      <ScrollView 
-      contentContainerStyle={styles.scrollContent} 
-      showsVerticalScrollIndicator={false}
-      refreshControl={
-                  <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={onRefresh}
-                    colors={["grey"]}
-                    progressBackgroundColor={"white"}
-                  />
-                }
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={["grey"]}
+            progressBackgroundColor={"white"}
+          />
+        }
       >
         <View style={styles.header}>
           <Text style={styles.appName}>Xpen</Text>
           <Text style={styles.date}>{new Date().toLocaleDateString()}</Text>
         </View>
 
-        <SummaryCard amountSum={amountSum} />
+        <SummaryCard amountSum={amountSum} incomeSum={incomeSum} />
         <ActionButtons />
-          {loading ? (
-                    <TransactionListSkeleton />
-                  ) : (
-                    <TransactionList transactions={transactions} />
-                  )}
+        {loading ? (
+          <TransactionListSkeleton />
+        ) : (
+          <TransactionList showBy="day" transactions={transactions} />
+
+        )}
 
       </ScrollView>
     </SafeAreaView>
