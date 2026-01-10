@@ -1,7 +1,12 @@
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { StyleSheet, TextInput, View } from "react-native";
 
-export function SearchBar() {
+interface SearchBarProps {
+    value?: string;
+    onChangeText?: (text: string) => void;
+}
+
+export function SearchBar({ value, onChangeText }: SearchBarProps) {
     return (
         <View style={styles.container}>
             <View style={styles.iconBefore}>
@@ -12,6 +17,8 @@ export function SearchBar() {
                 style={styles.input}
                 placeholder="Search transactions..."
                 placeholderTextColor="#A0A0A5"
+                value={value}
+                onChangeText={onChangeText}
             />
         </View>
     );

@@ -13,16 +13,54 @@ export default function DashboardScreen() {
   const [transactions, setTransactions] = useState<IExpenses[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [selectedRange, setSelectedRange] = useState("This Month");
   useEffect(() => {
     fetchTransactions();
   }, []);
 
-  const fetchTransactions = async () => {
+  const fetchTransactions = async (range = selectedRange) => {
     try {
       setLoading(true);
-      const response = await api.get(`/expenses/month/${new Date().getMonth() + 1}/${new Date().getFullYear()}`);
-      setTransactions(response.data);
-      console.log(response.data);
+      let data = [];
+      const now = new Date();
+
+      if (range === "This Month") {
+        const response = await api.get(
+          `/expenses/month/${now.getMonth() + 1}/${now.getFullYear()}`
+        );
+        data = response.data;
+      } else if (range === "Today") {
+        const response = await api.get(
+          `/expenses/month/${now.getMonth() + 1}/${now.getFullYear()}`
+        );
+        data = response.data.filter(
+          (t: IExpenses) => new Date(t.expense_date).getDate() === now.getDate()
+        );
+      } else {
+        // This Week, This Year
+        const response = await api.get("/expenses");
+        data = response.data;
+
+        if (range === "This Week") {
+          const startOfWeek = new Date(now);
+          startOfWeek.setDate(now.getDate() - now.getDay()); // Sunday as start
+          startOfWeek.setHours(0, 0, 0, 0);
+
+          const endOfWeek = new Date(startOfWeek);
+          endOfWeek.setDate(startOfWeek.getDate() + 6);
+          endOfWeek.setHours(23, 59, 59, 999);
+
+          data = data.filter((t: IExpenses) => {
+            const tDate = new Date(t.expense_date);
+            return tDate >= startOfWeek && tDate <= endOfWeek;
+          });
+        } else if (range === "This Year") {
+          data = data.filter(
+            (t: IExpenses) => new Date(t.expense_date).getFullYear() === now.getFullYear()
+          );
+        }
+      }
+      setTransactions(data);
     } catch (error) {
       console.error("Failed to fetch transactions:", error);
     } finally {
@@ -68,7 +106,15 @@ export default function DashboardScreen() {
           <Text style={styles.date}>{new Date().toLocaleDateString()}</Text>
         </View>
 
-        <SummaryCard amountSum={amountSum} incomeSum={incomeSum} />
+        <SummaryCard
+          amountSum={amountSum}
+          incomeSum={incomeSum}
+          selectedRange={selectedRange}
+          onRangeChange={(range) => {
+            setSelectedRange(range);
+            fetchTransactions(range);
+          }}
+        />
         <ActionButtons />
         {loading ? (
           <TransactionListSkeleton />

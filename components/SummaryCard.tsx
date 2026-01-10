@@ -32,9 +32,20 @@ function MiniCard({ icon, label, amount, action, onPress, remainingAmount }: { i
   );
 }
 
-export function SummaryCard({ amountSum, incomeSum }: { amountSum: number; incomeSum: number }) {
+export function SummaryCard({
+  amountSum,
+  incomeSum,
+  selectedRange,
+  onRangeChange,
+}: {
+  amountSum: number;
+  incomeSum: number;
+  selectedRange: string;
+  onRangeChange: (range: string) => void;
+}) {
   const [hasBudget, setHasBudget] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [dropdownVisible, setDropdownVisible] = useState(false);
   const [budgetAmount, setBudgetAmount] = useState("");
   const [budgetId, setBudgetId] = useState("");
 
@@ -70,12 +81,12 @@ export function SummaryCard({ amountSum, incomeSum }: { amountSum: number; incom
     }
   };
 
-
-
   useEffect(() => {
     fetchBudget();
   }, [hasBudget]);
   const remainingAmount = Number(budgetAmount) + amountSum;
+
+  const ranges = ["Today", "This Week", "This Month", "This Year"];
 
   return (
     <LinearGradient
@@ -85,14 +96,49 @@ export function SummaryCard({ amountSum, incomeSum }: { amountSum: number; incom
       style={styles.card}
     >
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Expenses This Month</Text>
-        <IconSymbol name="ellipsis.circle" size={20} color="rgba(255,255,255,0.7)" />
+        <Text style={styles.headerTitle}>Expenses {selectedRange}</Text>
+        <View>
+          <TouchableOpacity onPress={() => setDropdownVisible(!dropdownVisible)}>
+            <IconSymbol
+              name="ellipsis.circle"
+              size={20}
+              color="rgba(255,255,255,0.7)"
+            />
+          </TouchableOpacity>
+          {dropdownVisible && (
+            <View style={styles.dropdown}>
+              {ranges.map((range) => (
+                <TouchableOpacity
+                  key={range}
+                  style={styles.dropdownItem}
+                  onPress={() => {
+                    onRangeChange(range);
+                    setDropdownVisible(false);
+                  }}
+                >
+                  <Text
+                    style={[
+                      styles.dropdownText,
+                      selectedRange === range && styles.selectedDropdownText,
+                    ]}
+                  >
+                    {range}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+        </View>
       </View>
 
       <Text style={styles.totalAmount}>₹{amountSum}</Text>
 
       <View style={styles.row}>
-        <MiniCard icon="arrow.up.right" label="Income - Month" amount={incomeSum.toFixed(2)} />
+        <MiniCard
+          icon="arrow.up.right"
+          label={`Income - ${selectedRange}`}
+          amount={incomeSum.toFixed(2)}
+        />
         <View style={{ width: 12 }} />
         <MiniCard
           icon="creditcard.fill"
@@ -163,6 +209,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 8,
+    zIndex: 1000,
   },
   headerTitle: {
     color: "#E0E0E0",
@@ -245,6 +292,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
     width: '100%',
+
   },
   modalButton: {
     flex: 1,
@@ -270,5 +318,33 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 12,
     fontWeight: '600',
+  },
+  dropdown: {
+    position: "absolute",
+    top: 25,
+    right: 0,
+    backgroundColor: "#1E1E1E",
+    borderRadius: 12,
+    padding: 8,
+    zIndex: 2000,
+    width: 120,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  dropdownItem: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+  dropdownText: {
+    color: "#A0A0A5",
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  selectedDropdownText: {
+    color: "#fff",
+    fontWeight: "700",
   },
 });
