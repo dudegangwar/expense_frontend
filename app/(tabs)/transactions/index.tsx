@@ -98,8 +98,8 @@ export default function TransactionsScreen() {
 
     // Type Filter
     if (activeFilters.type) {
-      if (activeFilters.type === "income" && t.amount < 0) return false;
-      if (activeFilters.type === "expense" && t.amount > 0) return false;
+      if (activeFilters.type === "income" && t.expense_type !== "income") return false;
+      if (activeFilters.type === "expense" && t.expense_type !== "expense") return false;
     }
 
     return true;

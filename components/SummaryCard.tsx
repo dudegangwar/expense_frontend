@@ -50,18 +50,18 @@ export function SummaryCard({
   const [budgetId, setBudgetId] = useState("");
 
   const handleSave = async () => {
-    console.log("Saving budget:", budgetAmount);
+    // console.log("Saving budget:", budgetAmount);
     try {
       if (!hasBudget) {
         const response = await api.post("/budgets", { amount: budgetAmount, month: `${new Date().getFullYear()}-${new Date().getMonth() + 1}` });
-        console.log("Budget saved successfully:", response.data);
+        // console.log("Budget saved successfully:", response.data);
         setHasBudget(true);
       } else {
         const response = await api.put(`/budgets/${budgetId}`, { amount: budgetAmount });
-        console.log("Budget updated successfully:", response.data);
+        // console.log("Budget updated successfully:", response.data);
       }
     } catch (error) {
-      console.error("Error saving budget:", error);
+      // console.error("Error saving budget:", error);
     }
 
     setModalVisible(false);
@@ -69,8 +69,9 @@ export function SummaryCard({
 
   const fetchBudget = async () => {
     try {
-      const response = await api.get(`/budgets/by-month?month=${new Date().getFullYear()}-${new Date().getMonth() + 1}`);
-      console.log("Budget fetched successfully:", response.data);
+      const response = await api.get(`/budgets/by-month?year=${new Date().getFullYear()}&month=${new Date().getMonth() + 1}`);
+      // console.log("Budget fetched successfully:", response.data);
+      // console.log("Month", `${new Date().getFullYear()}-${new Date().getMonth() + 1}`);
       if (response.data) {
         setBudgetAmount(response.data.amount.$numberDecimal);
         setBudgetId(response.data._id);
@@ -84,7 +85,7 @@ export function SummaryCard({
   useEffect(() => {
     fetchBudget();
   }, [hasBudget]);
-  const remainingAmount = Number(budgetAmount) + amountSum;
+  const remainingAmount = Number(budgetAmount) - amountSum;
 
   const ranges = ["Today", "This Week", "This Month", "This Year"];
 

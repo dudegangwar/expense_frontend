@@ -33,7 +33,7 @@ export function DropdownInput({ label, value, options, onSelect, placeholder = "
                 <Text style={[styles.valueText, !selectedOption && styles.placeholder]}>
                     {selectedOption ? selectedOption.label : placeholder}
                 </Text>
-                <IconSymbol name="chevron.down" size={16} color="#666" />
+                <IconSymbol name="chevron.down" size={16} color="#A0A0A5" />
             </TouchableOpacity>
 
             <Modal
@@ -60,7 +60,7 @@ export function DropdownInput({ label, value, options, onSelect, placeholder = "
                                         {item.icon && (
                                             <View style={styles.iconContainer}>
                                                 {/* @ts-ignore */}
-                                                <IconSymbol name={item.icon} size={20} color={item.value === value ? "#fff" : "#333"} />
+                                                <IconSymbol name={item.icon} size={20} color={item.value === value ? "#fff" : "#A0A0A5"} />
                                             </View>
                                         )}
                                         <Text style={[
@@ -89,26 +89,26 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 14,
-        color: "#555",
+        color: "#fff",
         marginBottom: 6,
         fontWeight: '500',
     },
     trigger: {
         borderWidth: 1,
-        borderColor: "#CCC",
+        borderColor: "#2A2C35",
         borderRadius: 8,
         padding: 12,
-        backgroundColor: "#FFF",
+        backgroundColor: "#15171E",
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
     },
     valueText: {
         fontSize: 16,
-        color: "#000",
+        color: "#fff",
     },
     placeholder: {
-        color: "#999",
+        color: "#A0A0A5",
     },
     overlay: {
         flex: 1,
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     modalContent: {
-        backgroundColor: '#fff',
+        backgroundColor: '#1E2029',
         borderRadius: 16,
         padding: 20,
         maxHeight: '80%',
@@ -127,6 +127,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         marginBottom: 16,
         textAlign: 'center',
+        color: "#fff",
     },
     optionItem: {
         paddingVertical: 12,
@@ -151,7 +152,7 @@ const styles = StyleSheet.create({
     },
     optionText: {
         fontSize: 16,
-        color: '#333',
+        color: '#fff',
     },
     selectedOptionText: {
         color: '#fff',

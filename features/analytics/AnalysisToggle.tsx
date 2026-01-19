@@ -1,19 +1,42 @@
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-export function AnalysisToggle() {
+interface AnalysisToggleProps {
+    activeView: 'categories' | 'trends';
+    onToggle: (view: 'categories' | 'trends') => void;
+}
+
+export function AnalysisToggle({ activeView, onToggle }: AnalysisToggleProps) {
     return (
         <View style={styles.container}>
-            <TouchableOpacity style={styles.tabActive}>
+            <TouchableOpacity
+                style={activeView === 'categories' ? styles.tabActive : styles.tabInactive}
+                onPress={() => onToggle('categories')}
+            >
                 {/* @ts-ignore */}
-                <IconSymbol name="chart.pie.fill" size={16} color="#fff" />
-                <Text style={styles.textActive}>Categories</Text>
+                <IconSymbol
+                    name="chart.pie.fill"
+                    size={16}
+                    color={activeView === 'categories' ? "#fff" : "#A0A0A5"}
+                />
+                <Text style={activeView === 'categories' ? styles.textActive : styles.textInactive}>
+                    Categories
+                </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.tabInactive}>
+            <TouchableOpacity
+                style={activeView === 'trends' ? styles.tabActive : styles.tabInactive}
+                onPress={() => onToggle('trends')}
+            >
                 {/* @ts-ignore */}
-                <IconSymbol name="chart.line.uptrend.xyaxis" size={16} color="#A0A0A5" />
-                <Text style={styles.textInactive}>Trends</Text>
+                <IconSymbol
+                    name="chart.line.uptrend.xyaxis"
+                    size={16}
+                    color={activeView === 'trends' ? "#fff" : "#A0A0A5"}
+                />
+                <Text style={activeView === 'trends' ? styles.textActive : styles.textInactive}>
+                    Trends
+                </Text>
             </TouchableOpacity>
         </View>
     );

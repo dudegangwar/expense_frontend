@@ -17,13 +17,12 @@ export default function DashboardScreen() {
   useEffect(() => {
     fetchTransactions();
   }, []);
-
+  // console.log("transactions", transactions);
   const fetchTransactions = async (range = selectedRange) => {
     try {
       setLoading(true);
       let data = [];
       const now = new Date();
-
       if (range === "This Month") {
         const response = await api.get(
           `/expenses/month/${now.getMonth() + 1}/${now.getFullYear()}`
@@ -67,14 +66,14 @@ export default function DashboardScreen() {
       setLoading(false);
     }
   };
-  const amountSum = transactions.reduce(
+  const amountSum = transactions.filter(t => t.expense_type === "expense").reduce(
     (total, transaction) =>
-      transaction.amount < 0 ? total + transaction.amount : total,
+      total + transaction.amount,
     0
   );
-  const incomeSum = transactions.reduce(
+  const incomeSum = transactions.filter(t => t.expense_type === "income").reduce(
     (total, transaction) =>
-      transaction.amount > 0 ? total + transaction.amount : total,
+      total + transaction.amount,
     0
   );
 

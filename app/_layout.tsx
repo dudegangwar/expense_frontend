@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { router, Stack } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { useEffect } from "react";
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -29,8 +30,10 @@ export default function RootLayout() {
     // Any global side-effects can be handled here
   }, []);
   return (
-    <QueryClientProvider client={queryClient}>
-      <Stack screenOptions={{ headerShown: false }} />
-    </QueryClientProvider>
+    <SafeAreaProvider>
+      <QueryClientProvider client={queryClient}>
+        <Stack screenOptions={{ headerShown: false }} />
+      </QueryClientProvider>
+    </SafeAreaProvider>
   );
 }

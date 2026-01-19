@@ -32,18 +32,19 @@ function Form({ type }: { type: "income" | "expense" }) {
 
   const submitTransactionAndAddAnother = async () => {
     saveTransaction();
-    console.log("Transaction submitted");
+    // console.log("Transaction submitted");
   };
   const saveTransaction = async () => {
     try {
       const response = await api.post("/expenses", {
-        amount: type === "expense" ? -Number(amount) : Number(amount),
+        amount: Number(amount),
         notes: notes,
+        expense_type: type,
         expense_date: date,
         category_id: selectedCategory,
         mood: Number(selectedMood),
       });
-      console.log("Transaction submitted:", response.data);
+      // console.log("Transaction submitted:", response.data);
       Alert.alert("Transaction submitted successfully");
       setAmount("");
       setNotes("");
@@ -64,12 +65,13 @@ function Form({ type }: { type: "income" | "expense" }) {
       const data = await getCategories();
 
       setCategories(data);
+      // console.log("Categories:", data);
     } catch (error) {
       console.error("Failed to fetch categories:", error);
     }
   };
 
-  const categoryOptions = categories.map(cat => ({
+  const categoryOptions = categories.filter(cat => cat.type === type).map(cat => ({
     label: `${cat.icon} ${cat.name}`,
     value: cat.id,
   }));
@@ -117,7 +119,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    color: "#555",
+    color: "#ffffffff",
     marginBottom: 6,
   },
   button: {

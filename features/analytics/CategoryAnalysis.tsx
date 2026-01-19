@@ -1,11 +1,27 @@
 import { StyleSheet, Text, View } from "react-native";
 import { PieChart } from "react-native-gifted-charts";
 
-function CategoryAnalysis() {
-  const pieData = [
-    { value: 91, color: "#2196F3", text: "Transportation", focused: true }, // Main blue
-    { value: 9, color: "#00BCD4", text: "Healthcare" }, // Cyan
-  ];
+interface ChartData {
+  value: number;
+  color: string;
+  text: string;
+  name?: string;
+  focused?: boolean;
+}
+
+export function CategoryAnalysis({ data }: { data: ChartData[] }) {
+  // Calculate total for percentage if needed, or assume data is already processed
+  // If data is empty, show a placeholder or empty state
+  if (!data || data.length === 0) {
+    return (
+      <View style={styles.chartCard}>
+        <Text style={{ color: '#A0A0A5', textAlign: 'center' }}>No data available</Text>
+      </View>
+    );
+  }
+
+  // Find the largest segment to display in center or just display total
+  const maxSegment = data.reduce((prev, current) => (prev.value > current.value) ? prev : current);
 
   return (
     <View style={styles.chartCard}>
@@ -14,27 +30,31 @@ function CategoryAnalysis() {
           <PieChart
             donut
             innerRadius={60}
-            data={pieData}
+            data={data}
             centerLabelComponent={() => {
-              return <Text style={styles.centerLabel}>91%</Text>;
+              return <Text style={styles.centerLabel}>{Math.round(maxSegment.value)}%</Text>;
             }}
             radius={100}
             strokeWidth={2}
             strokeColor="#15171E"
+            showText
+            textColor="white"
+            textSize={12}
+            fontWeight="bold"
           />
         </View>
 
         <View style={styles.legend}>
           <Text style={styles.legendTitle}>Categories</Text>
 
-          {pieData.map((item) => (
-            <View key={item.text} style={styles.legendItem}>
+          {data.map((item) => (
+            <View key={item.name || item.text} style={styles.legendItem}>
               <View
                 style={[styles.legendDot, { backgroundColor: item.color }]}
               />
               <View>
-                <Text style={styles.legendText}>{item.text}</Text>
-                <Text style={styles.legendValue}>{item.value}%</Text>
+                <Text style={styles.legendText}>{item.name || item.text}</Text>
+                <Text style={styles.legendValue}>{item.value.toFixed(1)}%</Text>
               </View>
             </View>
           ))}
@@ -43,7 +63,6 @@ function CategoryAnalysis() {
     </View>
   );
 }
-export { CategoryAnalysis };
 
 const styles = StyleSheet.create({
   chartCard: {
@@ -54,9 +73,9 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   pieRow: {
-    flexDirection: "row",
+    flexDirection: "column",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "center",
   },
   chartContainer: {
     alignItems: 'center',
@@ -68,8 +87,8 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   legend: {
-    flex: 1,
-    marginLeft: 20,
+    width: '100%',
+    marginTop: 20,
     justifyContent: 'center',
   },
   legendTitle: {

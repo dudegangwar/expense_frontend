@@ -21,20 +21,30 @@ function CategoryItem({ title, percentage, amount, icon, color }: { title: strin
     );
 }
 
-export function CategoryBreakdown() {
+interface CategoryBreakdownItem {
+    title: string;
+    percentage: string;
+    amount: string;
+    icon: string;
+    color: string;
+}
+
+export function CategoryBreakdown({ categories }: { categories: CategoryBreakdownItem[] }) {
     return (
         <View style={styles.container}>
             <Text style={styles.headerTitle}>Category Breakdown</Text>
 
-            <CategoryItem
-                title="Transportation"
-                percentage="90.9%"
-                amount="₹3,000.00"
-                icon="car.fill"
-                color="#2196F3"
-            />
-            {/* Additional items can be added here */}
-            {/* The screenshot shows a clipped second item or just one, adding just one for now to match main view */}
+            {categories.map((item, index) => (
+                <View key={index} style={{ marginBottom: 8 }}>
+                    <CategoryItem
+                        title={item.title}
+                        percentage={item.percentage}
+                        amount={item.amount}
+                        icon={item.icon}
+                        color={item.color}
+                    />
+                </View>
+            ))}
         </View>
     );
 }

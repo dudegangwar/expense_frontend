@@ -12,6 +12,7 @@ export function Input({ label, style, icon, ...props }: InputProps) {
             <View style={styles.inputWrapper}>
                 <TextInput
                     style={[styles.textInput, style]}
+                    placeholderTextColor="#A0A0A5"
                     {...props}
                 />
                 {icon && icon}
@@ -28,17 +29,18 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 14,
-        color: "#555",
+        color: "#fff",
         marginBottom: 6,
     },
     textInput: {
         borderWidth: 1,
-        borderColor: "#CCC",
+        borderColor: "#2A2C35",
         borderRadius: 8,
         padding: 12,
         flex: 1,
         fontSize: 16,
-        backgroundColor: "#FFF",
+        backgroundColor: "#15171E",
+        color: "#fff",
         textAlignVertical: "top", // helpful for multiline
     },
     inputWrapper: {

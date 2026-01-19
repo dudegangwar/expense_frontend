@@ -18,7 +18,7 @@ export default function DateInput({ value, onChange, placeholder }: { value: Dat
                     editable={false} // optional if opening date picker
                     label={'Enter Date'}
                     icon={<TouchableOpacity style={styles.icon} onPress={() => setOpen(true)}>
-                        <Ionicons name="calendar-outline" size={22} color="#666" />
+                        <Ionicons name="calendar-outline" size={22} color="#A0A0A5" />
                     </TouchableOpacity>} />
             </View>
             {open && <RNDateTimePicker value={date} onChange={(event, selectedDate) => {

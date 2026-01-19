@@ -56,6 +56,7 @@ function TransactionGroup({
 
       {isExpanded && group.transactions.map((transaction: any) => (
         <TransactionItem
+          expense_type={transaction.expense_type}
           key={transaction.id}
           title={transaction.notes}
           subtitle={transaction.category_name}

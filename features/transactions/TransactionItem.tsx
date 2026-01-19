@@ -9,15 +9,16 @@ interface TransactionItemProps {
   // date is typically in the group header now, but we can keep it if needed
   color?: string; // background color for icon
   icon?: string;
+  expense_type?: string;
 }
 
-function TransactionItem({ title, subtitle, amount, color = "#2C2C35", icon = "creditcard.fill" }: TransactionItemProps) {
-  const isNegative = amount.toString().startsWith("-");
+function TransactionItem({ title, subtitle, amount, color = "#2C2C35", icon = "creditcard.fill", expense_type }: TransactionItemProps) {
+  const isNegative = expense_type === "expense"
   return (
     <View style={styles.transaction}>
       <View style={[styles.iconContainer, { backgroundColor: color }]}>
         {/* @ts-ignore */}
-        <IconSymbol name={icon} size={20} color={"#5E60CE"} />
+        <IconSymbol name={expense_type === "expense" ? "creditcard.fill" : "creditcard.fill"} size={20} color={"#5E60CE"} />
       </View>
 
       <View style={styles.transactionInfo}>

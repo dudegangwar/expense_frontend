@@ -16,14 +16,20 @@ function SummaryItem({ title, amount, icon, color, isFullWidth = false }: { titl
     );
 }
 
-export function AnalysisSummary() {
+interface AnalysisSummaryProps {
+    income: number;
+    expense: number;
+    transactionCount: number;
+}
+
+export function AnalysisSummary({ income, expense, transactionCount }: AnalysisSummaryProps) {
     return (
         <View style={styles.container}>
             <View style={styles.row}>
                 <View style={{ flex: 1 }}>
                     <SummaryItem
                         title="Income"
-                        amount="45000.00"
+                        amount={income.toFixed(2)}
                         icon="arrow.up.right"
                         color="#4CAF50"
                     />
@@ -32,7 +38,7 @@ export function AnalysisSummary() {
                 <View style={{ flex: 1 }}>
                     <SummaryItem
                         title="Expenses"
-                        amount="3300.00"
+                        amount={Math.abs(expense).toFixed(2)}
                         icon="arrow.down.right"
                         color="#FD3C4A"
                     />
@@ -41,7 +47,7 @@ export function AnalysisSummary() {
 
             <SummaryItem
                 title="Transactions"
-                amount="3"
+                amount={transactionCount.toString()}
                 icon="doc.text.fill"
                 color="#2196F3"
                 isFullWidth

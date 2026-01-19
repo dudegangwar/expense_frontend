@@ -31,7 +31,7 @@ export default function RegisterScreen() {
 
         try {
             setLoading(true);
-            console.log("Attempting register with:", email);
+            // console.log("Attempting register with:", email);
 
             // 1. Register
             const registerRes = await api.post("/users/register", {
@@ -42,7 +42,7 @@ export default function RegisterScreen() {
                 currency_code: "INR" // Defaulting to INR as per screenshots
             });
 
-            console.log("Registration successful", registerRes.data);
+            // console.log("Registration successful", registerRes.data);
 
             // 2. Login automatically (optional, but good UX)
             // Assuming register API might return token or we need to login explicitly. 

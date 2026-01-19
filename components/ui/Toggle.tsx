@@ -13,7 +13,7 @@ export function Toggle({
     active,
     onPress,
     activeColor = "#4CAF50", // Default active color
-    inactiveColor = "#EEF5EA" // Default inactive color
+    inactiveColor = "#1E2029" // Default inactive color
 }: ToggleProps) {
     return (
         <TouchableOpacity
@@ -40,6 +40,6 @@ const styles = StyleSheet.create({
     },
     toggleText: {
         fontWeight: "600",
-        color: "#7CB342",
+        color: "#A0A0A5",
     },
 });

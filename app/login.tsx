@@ -28,7 +28,7 @@ export default function LoginScreen() {
 
     try {
       setLoading(true);
-      console.log("Attempting login with:", email);
+      // console.log("Attempting login with:", email);
 
       const res = await api.post("/users/login", {
         email,
