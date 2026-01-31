@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/Button";
 import DateInput from "@/components/ui/DateInput";
 import { DropdownInput } from "@/components/ui/DropdownInput";
 import api, { Category, getCategories } from "@/lib/api/api";
+import { useTransactionStore } from "@/store/transaction";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Alert, StyleSheet, View } from "react-native";
@@ -25,13 +26,15 @@ function Form({ type }: { type: "income" | "expense" }) {
     { label: "Angry", value: "-2" },
   ];
 
+  const { fetchTransactions } = useTransactionStore();
+
   const submitTransaction = async () => {
-    saveTransaction();
-    router.back();
+    const ok = await saveTransaction();
+    if (ok) router.back();
   };
 
   const submitTransactionAndAddAnother = async () => {
-    saveTransaction();
+    await saveTransaction();
     // console.log("Transaction submitted");
   };
   const saveTransaction = async () => {
@@ -44,6 +47,7 @@ function Form({ type }: { type: "income" | "expense" }) {
         category_id: selectedCategory,
         mood: Number(selectedMood),
       });
+
       // console.log("Transaction submitted:", response.data);
       Alert.alert("Transaction submitted successfully");
       setAmount("");
@@ -51,9 +55,14 @@ function Form({ type }: { type: "income" | "expense" }) {
       setDate(new Date());
       setSelectedCategory("");
       setSelectedMood("0");
+
+      // Refresh global transactions
+      await fetchTransactions();
+      return true;
     } catch (error) {
       console.error("Failed to submit transaction:", error);
       Alert.alert("Failed to submit transaction");
+      return false;
     }
   };
   useEffect(() => {
@@ -71,10 +80,12 @@ function Form({ type }: { type: "income" | "expense" }) {
     }
   };
 
-  const categoryOptions = categories.filter(cat => cat.type === type).map(cat => ({
-    label: `${cat.icon} ${cat.name}`,
-    value: cat.id,
-  }));
+  const categoryOptions = categories
+    .filter((cat) => cat.type === type)
+    .map((cat) => ({
+      label: `${cat.icon} ${cat.name}`,
+      value: cat.id,
+    }));
 
   const onChange = (event: any, selectedDate: any) => {
     setOpen(false);
@@ -85,8 +96,21 @@ function Form({ type }: { type: "income" | "expense" }) {
 
   return (
     <View>
-      <Input label="Amount" value={amount} onChangeText={setAmount} placeholder="Enter Amount" keyboardType="numeric" />
-      <Input label="Notes" value={notes} onChangeText={setNotes} placeholder="Enter Notes" multiline numberOfLines={4} />
+      <Input
+        label="Amount"
+        value={amount}
+        onChangeText={setAmount}
+        placeholder="Enter Amount"
+        keyboardType="numeric"
+      />
+      <Input
+        label="Notes"
+        value={notes}
+        onChangeText={setNotes}
+        placeholder="Enter Notes"
+        multiline
+        numberOfLines={4}
+      />
       <DateInput value={date} onChange={setDate} placeholder="Enter Date" />
 
       <DropdownInput
@@ -105,8 +129,12 @@ function Form({ type }: { type: "income" | "expense" }) {
         placeholder="Select Mood"
       />
       <View style={styles.buttonContainer}>
-        <Button style={styles.button} onPress={submitTransaction} >Save Transaction</Button>
-        <Button style={styles.button} onPress={submitTransactionAndAddAnother} >Save & Add Another</Button>
+        <Button style={styles.button} onPress={submitTransaction}>
+          Save Transaction
+        </Button>
+        <Button style={styles.button} onPress={submitTransactionAndAddAnother}>
+          Save & Add Another
+        </Button>
       </View>
     </View>
   );

@@ -2,9 +2,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { router, Stack } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { useEffect } from "react";
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { ThemeProvider } from '../context/ThemeContext';
-
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { ThemeProvider } from "../context/ThemeContext";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

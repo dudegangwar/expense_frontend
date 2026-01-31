@@ -2,23 +2,29 @@ import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useTheme } from "@/context/ThemeContext";
 import { IExpenses } from "@/types";
 import React, { useState } from "react";
-import { LayoutAnimation, Platform, StyleSheet, Text, TouchableOpacity, UIManager, View } from "react-native";
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import {
+  LayoutAnimation,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  UIManager,
+  View,
+} from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 import { TransactionItem } from "./TransactionItem";
 
-if (Platform.OS === 'android') {
+if (Platform.OS === "android") {
   if (UIManager.setLayoutAnimationEnabledExperimental) {
     UIManager.setLayoutAnimationEnabledExperimental(true);
   }
 }
 
-function TransactionGroup({
-  day,
-  group,
-}: {
-  day: string;
-  group: any;
-}) {
+function TransactionGroup({ day, group }: { day: string; group: any }) {
   const { theme } = useTheme();
   const [isExpanded, setIsExpanded] = useState(true);
   const rotate = useSharedValue(0);
@@ -34,6 +40,7 @@ function TransactionGroup({
       transform: [{ rotate: `${rotate.value}deg` }],
     };
   });
+ 
 
   return (
     <View style={styles.transactionGroup}>
@@ -45,35 +52,35 @@ function TransactionGroup({
         <View style={styles.groupHeaderLeft}>
           <Animated.View style={animatedStyle}>
             {/* @ts-ignore */}
-            <IconSymbol
-              name="chevron.down"
-              size={20}
-              color="#5E60CE"
-            />
+            <IconSymbol name="chevron.down" size={20} color="#5E60CE" />
           </Animated.View>
           <Text style={[styles.dayText, { color: theme.text }]}>{day}</Text>
         </View>
-        <Text style={[styles.countText, { color: theme.textSecondary }]}>{group?.transactions?.length} Transactions</Text>
+        <Text style={[styles.countText, { color: theme.textSecondary }]}>
+          {group?.transactions?.length} Transactions
+        </Text>
       </TouchableOpacity>
 
-      {isExpanded && group.transactions.map((transaction: any) => (
-        <TransactionItem
-          expense_type={transaction.expense_type}
-          key={transaction.id}
-          title={transaction.notes}
-          subtitle={transaction.category_name}
-          amount={transaction.amount}
-          date={transaction.expense_date}
-          color="rgba(33, 150, 243, 0.1)"
-          icon="car.fill"
-        />
-      ))}
+      {isExpanded &&
+        group.transactions.map((transaction: any) => (
+          <TransactionItem
+            expense_type={transaction.expense_type}
+            key={transaction.id}
+            title={transaction.notes}
+            subtitle={transaction.category_name}
+            amount={transaction.amount}
+            date={transaction.expense_date}
+            color="rgba(33, 150, 243, 0.1)"
+            icon="car.fill"
+          />
+        ))}
     </View>
   );
 }
 
 export function TransactionList({
-  transactions, showBy = "month"
+  transactions,
+  showBy = "month",
 }: {
   transactions: IExpenses[];
   showBy?: string;
@@ -127,8 +134,12 @@ export function TransactionList({
     }, {});
   };
 
+  const transactionGroups =
+    showBy === "month"
+      ? groupTransactionsByMonthAndYear(transactions)
+      : groupTransactionsByDay(transactions);
 
-  const transactionGroups = showBy === "month" ? groupTransactionsByMonthAndYear(transactions) : groupTransactionsByDay(transactions);
+  
   return (
     <View style={styles.container}>
       {transactions.length > 0 &&

@@ -5,7 +5,7 @@ import { StyleSheet, Text, View } from "react-native";
 interface TransactionItemProps {
   title: string;
   subtitle?: string;
-  amount: string;
+  amount: number | string;
   date?: string;
   // date is typically in the group header now, but we can keep it if needed
   color?: string; // background color for icon
@@ -13,19 +13,49 @@ interface TransactionItemProps {
   expense_type?: string;
 }
 
-function TransactionItem({ title, subtitle, amount, color = "#2C2C35", icon = "creditcard.fill", expense_type }: TransactionItemProps) {
+function TransactionItem({
+  title,
+  subtitle,
+  amount,
+  color = "#2C2C35",
+  icon = "creditcard.fill",
+  expense_type,
+}: TransactionItemProps) {
   const { theme, isDarkMode } = useTheme();
-  const isNegative = expense_type === "expense"
+  const numericAmount = typeof amount === "string" ? Number(amount) : amount;
+  const isNegative =
+    (expense_type && expense_type.toLowerCase() === "expense") ||
+    (typeof numericAmount === "number" && numericAmount < 0);
+
   return (
-    <View style={[styles.transaction, { backgroundColor: theme.cardBackground, borderColor: theme.border }]}>
+    <View
+      style={[
+        styles.transaction,
+        { backgroundColor: theme.cardBackground, borderColor: theme.border },
+      ]}
+    >
       <View style={[styles.iconContainer, { backgroundColor: color }]}>
         {/* @ts-ignore */}
-        <IconSymbol name={expense_type === "expense" ? "creditcard.fill" : "creditcard.fill"} size={20} color={"#5E60CE"} />
+        <IconSymbol
+          name={
+            expense_type === "expense" ? "creditcard.fill" : "creditcard.fill"
+          }
+          size={20}
+          color={"#5E60CE"}
+        />
       </View>
 
       <View style={styles.transactionInfo}>
-        <Text style={[styles.transactionTitle, { color: theme.text }]}>{title}</Text>
-        {subtitle && <Text style={[styles.transactionSubtitle, { color: theme.textSecondary }]}>{subtitle}</Text>}
+        <Text style={[styles.transactionTitle, { color: theme.text }]}>
+          {title}
+        </Text>
+        {subtitle && (
+          <Text
+            style={[styles.transactionSubtitle, { color: theme.textSecondary }]}
+          >
+            {subtitle}
+          </Text>
+        )}
       </View>
 
       <View style={styles.transactionRight}>

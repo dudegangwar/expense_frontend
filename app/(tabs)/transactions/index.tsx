@@ -6,12 +6,10 @@ import { FilterBar } from "@/features/transactions/FilterBar";
 import { MonthSelector } from "@/features/transactions/MonthSelector";
 import { SearchBar } from "@/features/transactions/SearchBar";
 import { TransactionList } from "@/features/transactions/TransactionList";
-import api from "@/lib/api/api";
-import { IExpenses } from "@/types";
+import { useTransactionStore } from "@/store/transaction";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  Alert,
   RefreshControl,
   ScrollView,
   StatusBar,
@@ -24,8 +22,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function TransactionsScreen() {
   const { theme, isDarkMode } = useTheme();
-  const [transactions, setTransactions] = useState<IExpenses[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const { transactions, fetchTransactions, loading } = useTransactionStore();
   const [refreshing, setRefreshing] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState(new Date());
   const [isYearView, setIsYearView] = useState(false);
@@ -36,94 +33,111 @@ export default function TransactionsScreen() {
     sort: string | null;
   }>({ type: null, sort: null });
 
+  const {
+    setSelectedMonth: setStoreSelectedMonth,
+    setIsYearView: setStoreIsYearView,
+  } = useTransactionStore();
+
   useEffect(() => {
-    fetchTransactions();
+    // keep store in sync so global fetch uses the correct context
+    setStoreSelectedMonth(selectedMonth);
+    setStoreIsYearView(isYearView);
+
+    if (isYearView) {
+      fetchTransactions({ isYearView: true, selectedMonth });
+    } else {
+      fetchTransactions({ selectedMonth });
+    }
   }, [selectedMonth, isYearView]);
 
-  const fetchTransactions = async () => {
-    try {
-      setLoading(true);
-
-      if (isYearView) {
-        // Fetch all transactions (or by year if API supported it, but user asked for "whole year")
-        // Assuming /expenses returns all transactions, we can filter by year client-side or if API supports year param
-        // For now, let's assume /expenses returns all and we filter by selectedMonth's year
-        const response = await api.get("/expenses");
-        const yearTransactions = response.data.filter((t: IExpenses) =>
-          new Date(t.expense_date).getFullYear() === selectedMonth.getFullYear()
-        );
-        setTransactions(yearTransactions);
-      } else {
-        // Fetch by month
-        const response = await api.get(
-          `/expenses/month/${selectedMonth.getMonth() + 1}/${selectedMonth.getFullYear()}`
-        );
-        setTransactions(response.data);
-      }
-    } catch (error) {
-      Alert.alert("Error", "Failed to fetch transactions");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const onRefresh = () => {
+  const onRefresh = async () => {
     setRefreshing(true);
-    setTimeout(() => {
-      fetchTransactions();
-      setRefreshing(false);
-    }, 2000);
+    if (isYearView) {
+      await fetchTransactions({
+        isYearView: true,
+        selectedMonth,
+      });
+    } else {
+      await fetchTransactions({ selectedMonth });
+    }
+    setRefreshing(false);
   };
 
-  const filteredTransactions = transactions.filter((t) => {
-    // Date Filter
-    if (selectedDate) {
-      const tDate = new Date(t.expense_date);
-      if (
-        tDate.getDate() !== selectedDate.getDate() ||
-        tDate.getMonth() !== selectedDate.getMonth() ||
-        tDate.getFullYear() !== selectedDate.getFullYear()
-      ) {
-        return false;
+  const filteredTransactions = transactions
+    .filter((t) => {
+      // Date Filter
+      if (selectedDate) {
+        const tDate = new Date(t.expense_date);
+        if (
+          tDate.getDate() !== selectedDate.getDate() ||
+          tDate.getMonth() !== selectedDate.getMonth() ||
+          tDate.getFullYear() !== selectedDate.getFullYear()
+        ) {
+          return false;
+        }
       }
-    }
 
-    // Search Filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      const notes = t.notes?.toLowerCase() || "";
-      const category = t.category_name?.toLowerCase() || "";
-      if (!notes.includes(query) && !category.includes(query)) {
-        return false;
+      // Search Filter
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        const notes = t.notes?.toLowerCase() || "";
+        const category = t.category_name?.toLowerCase() || "";
+        if (!notes.includes(query) && !category.includes(query)) {
+          return false;
+        }
       }
-    }
 
-    // Type Filter
-    if (activeFilters.type) {
-      if (activeFilters.type === "income" && t.expense_type !== "income") return false;
-      if (activeFilters.type === "expense" && t.expense_type !== "expense") return false;
-    }
+      // Type Filter
+      if (activeFilters.type) {
+        if (activeFilters.type === "income" && t.expense_type !== "income")
+          return false;
+        if (activeFilters.type === "expense" && t.expense_type !== "expense")
+          return false;
+      }
 
-    return true;
-  }).sort((a, b) => {
-    // Sort Filter
-    if (activeFilters.sort) {
-      if (activeFilters.sort === "highest") return Math.abs(b.amount) - Math.abs(a.amount);
-      if (activeFilters.sort === "lowest") return Math.abs(a.amount) - Math.abs(b.amount);
-      if (activeFilters.sort === "newest") return new Date(b.expense_date).getTime() - new Date(a.expense_date).getTime();
-      if (activeFilters.sort === "oldest") return new Date(a.expense_date).getTime() - new Date(b.expense_date).getTime();
-    }
-    return 0;
-  });
-
+      return true;
+    })
+    .sort((a, b) => {
+      // Sort Filter
+      if (activeFilters.sort) {
+        if (activeFilters.sort === "highest")
+          return Math.abs(b.amount) - Math.abs(a.amount);
+        if (activeFilters.sort === "lowest")
+          return Math.abs(a.amount) - Math.abs(b.amount);
+        if (activeFilters.sort === "newest")
+          return (
+            new Date(b.expense_date).getTime() -
+            new Date(a.expense_date).getTime()
+          );
+        if (activeFilters.sort === "oldest")
+          return (
+            new Date(a.expense_date).getTime() -
+            new Date(b.expense_date).getTime()
+          );
+      }
+      return 0;
+    });
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
-      <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} backgroundColor={theme.background} />
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: theme.background }]}
+    >
+      <StatusBar
+        barStyle={isDarkMode ? "light-content" : "dark-content"}
+        backgroundColor={theme.background}
+      />
 
       <View style={styles.header}>
-        <Text style={[styles.headerTitle, { color: theme.text }]}>Transactions</Text>
+        <Text style={[styles.headerTitle, { color: theme.text }]}>
+          Transactions
+        </Text>
         <TouchableOpacity
-          style={[styles.addButton, { backgroundColor: theme.cardBackground, borderColor: theme.border }]}
+          style={[
+            styles.addButton,
+            {
+              backgroundColor: theme.cardBackground,
+              borderColor: theme.border,
+            },
+          ]}
           onPress={() => router.push("/add")}
         >
           {/* @ts-ignore */}
@@ -153,7 +167,10 @@ export default function TransactionsScreen() {
         )}
 
         <SearchBar value={searchQuery} onChangeText={setSearchQuery} />
-        <FilterBar activeFilters={activeFilters} onFilterChange={setActiveFilters} />
+        <FilterBar
+          activeFilters={activeFilters}
+          onFilterChange={setActiveFilters}
+        />
         <ScrollView
           style={{ flex: 1 }}
           showsVerticalScrollIndicator={false}
