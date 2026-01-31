@@ -1,14 +1,16 @@
+import { useTheme } from "@/context/ThemeContext";
 import { router } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 function Header() {
+  const { theme } = useTheme();
   return (
     <View style={styles.header}>
       <TouchableOpacity onPress={() => router.back()}>
-        <Text style={styles.close}>✕</Text>
+        <Text style={[styles.close, { color: theme.text }]}>✕</Text>
       </TouchableOpacity>
 
-      <Text style={styles.headerTitle}>Add Transaction</Text>
+      <Text style={[styles.headerTitle, { color: theme.text }]}>Add Transaction</Text>
 
       {/* <TouchableOpacity>
         <Text style={styles.save}>SAVE</Text>

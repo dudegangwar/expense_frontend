@@ -1,4 +1,5 @@
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { useTheme } from "@/context/ThemeContext";
 import { StyleSheet, TextInput, View } from "react-native";
 
 interface SearchBarProps {
@@ -7,16 +8,17 @@ interface SearchBarProps {
 }
 
 export function SearchBar({ value, onChangeText }: SearchBarProps) {
+    const { theme } = useTheme();
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: theme.cardBackground, borderColor: theme.border }]}>
             <View style={styles.iconBefore}>
                 {/* @ts-ignore */}
-                <IconSymbol name="magnifyingglass" size={20} color="#A0A0A5" />
+                <IconSymbol name="magnifyingglass" size={20} color={theme.textSecondary} />
             </View>
             <TextInput
-                style={styles.input}
+                style={[styles.input, { color: theme.text }]}
                 placeholder="Search transactions..."
-                placeholderTextColor="#A0A0A5"
+                placeholderTextColor={theme.textSecondary}
                 value={value}
                 onChangeText={onChangeText}
             />

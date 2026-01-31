@@ -1,3 +1,4 @@
+import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons'; // Expo
 import RNDateTimePicker from '@react-native-community/datetimepicker';
 import React from 'react';
@@ -6,6 +7,7 @@ import { Input } from './Input';
 // import Icon from 'react-native-vector-icons/Ionicons'; // CLI
 
 export default function DateInput({ value, onChange, placeholder }: { value: Date; onChange: (value: Date) => void; placeholder: string }) {
+    const { theme } = useTheme();
     const [open, setOpen] = React.useState(false);
     const [date, setDate] = React.useState(value || new Date());
 
@@ -18,7 +20,7 @@ export default function DateInput({ value, onChange, placeholder }: { value: Dat
                     editable={false} // optional if opening date picker
                     label={'Enter Date'}
                     icon={<TouchableOpacity style={styles.icon} onPress={() => setOpen(true)}>
-                        <Ionicons name="calendar-outline" size={22} color="#A0A0A5" />
+                        <Ionicons name="calendar-outline" size={22} color={theme.textSecondary} />
                     </TouchableOpacity>} />
             </View>
             {open && <RNDateTimePicker value={date} onChange={(event, selectedDate) => {

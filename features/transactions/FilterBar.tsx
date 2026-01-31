@@ -1,4 +1,5 @@
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { useTheme } from "@/context/ThemeContext";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface FilterBarProps {
@@ -20,12 +21,13 @@ function FilterChip({
     hasDropdown?: boolean;
     onPress?: () => void;
 }) {
+    const { theme } = useTheme();
     return (
         <TouchableOpacity
-            style={[styles.chip, active && styles.chipActive]}
+            style={[styles.chip, { backgroundColor: theme.cardBackground, borderColor: theme.border }, active && styles.chipActive]}
             onPress={onPress}
         >
-            <Text style={[styles.chipText, active && styles.chipTextActive]}>{label}</Text>
+            <Text style={[styles.chipText, { color: theme.textSecondary }, active && styles.chipTextActive]}>{label}</Text>
             {hasDropdown && (
                 <View style={styles.dropdownIcon}>
                     {/* @ts-ignore */}

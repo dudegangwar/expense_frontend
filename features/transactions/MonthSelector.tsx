@@ -1,4 +1,5 @@
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { useTheme } from "@/context/ThemeContext";
 import React from "react";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -10,6 +11,7 @@ interface MonthSelectorProps {
 }
 
 export function MonthSelector({ selectedMonth, onMonthChange, isAllMonths, onAllMonthsSelect }: MonthSelectorProps) {
+    const { theme, isDarkMode } = useTheme();
     const months = Array.from({ length: 12 }, (_, i) => {
         const date = new Date(selectedMonth.getFullYear(), i, 1);
         return date;
@@ -27,11 +29,11 @@ export function MonthSelector({ selectedMonth, onMonthChange, isAllMonths, onAll
         <View style={styles.container}>
             <View style={styles.yearSelector}>
                 <TouchableOpacity onPress={handlePrevYear}>
-                    <IconSymbol name="chevron.left" size={20} color="#fff" />
+                    <IconSymbol name="chevron.left" size={20} color={theme.text} />
                 </TouchableOpacity>
-                <Text style={styles.yearText}>{selectedMonth.getFullYear()}</Text>
+                <Text style={[styles.yearText, { color: theme.text }]}>{selectedMonth.getFullYear()}</Text>
                 <TouchableOpacity onPress={handleNextYear}>
-                    <IconSymbol name="chevron.right" size={20} color="#fff" />
+                    <IconSymbol name="chevron.right" size={20} color={theme.text} />
                 </TouchableOpacity>
             </View>
 
@@ -41,10 +43,10 @@ export function MonthSelector({ selectedMonth, onMonthChange, isAllMonths, onAll
                 contentContainerStyle={styles.monthsContainer}
             >
                 <TouchableOpacity
-                    style={[styles.monthTab, isAllMonths && styles.selectedMonthTab]}
+                    style={[styles.monthTab, { backgroundColor: isDarkMode ? "rgba(255, 255, 255, 0.1)" : "rgba(0,0,0, 0.05)" }, isAllMonths && styles.selectedMonthTab]}
                     onPress={onAllMonthsSelect}
                 >
-                    <Text style={[styles.monthText, isAllMonths && styles.selectedMonthText]}>
+                    <Text style={[styles.monthText, { color: theme.textSecondary }, isAllMonths && styles.selectedMonthText]}>
                         All
                     </Text>
                 </TouchableOpacity>
@@ -54,10 +56,10 @@ export function MonthSelector({ selectedMonth, onMonthChange, isAllMonths, onAll
                     return (
                         <TouchableOpacity
                             key={index}
-                            style={[styles.monthTab, isSelected && styles.selectedMonthTab]}
+                            style={[styles.monthTab, { backgroundColor: isDarkMode ? "rgba(255, 255, 255, 0.1)" : "rgba(0,0,0, 0.05)" }, isSelected && styles.selectedMonthTab]}
                             onPress={() => onMonthChange(date)}
                         >
-                            <Text style={[styles.monthText, isSelected && styles.selectedMonthText]}>
+                            <Text style={[styles.monthText, { color: theme.textSecondary }, isSelected && styles.selectedMonthText]}>
                                 {date.toLocaleString("default", { month: "short" })}
                             </Text>
                         </TouchableOpacity>

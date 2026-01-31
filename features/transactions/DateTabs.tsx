@@ -1,3 +1,4 @@
+import { useTheme } from "@/context/ThemeContext";
 import React, { useEffect, useRef } from "react";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -8,6 +9,7 @@ interface DateTabsProps {
 }
 
 export function DateTabs({ selectedMonth, selectedDate, onDateChange }: DateTabsProps) {
+    const { theme, isDarkMode } = useTheme();
     const scrollViewRef = useRef<ScrollView>(null);
 
     const daysInMonth = new Date(
@@ -39,10 +41,10 @@ export function DateTabs({ selectedMonth, selectedDate, onDateChange }: DateTabs
                 contentContainerStyle={styles.daysContainer}
             >
                 <TouchableOpacity
-                    style={[styles.dayTab, selectedDate === null && styles.selectedDayTab]}
+                    style={[styles.dayTab, { backgroundColor: isDarkMode ? "rgba(255, 255, 255, 0.05)" : "rgba(0,0,0, 0.05)" }, selectedDate === null && styles.selectedDayTab]}
                     onPress={() => onDateChange(null)}
                 >
-                    <Text style={[styles.dayText, selectedDate === null && styles.selectedDayText]}>
+                    <Text style={[styles.dayText, { color: theme.textSecondary }, selectedDate === null && styles.selectedDayText]}>
                         All
                     </Text>
                 </TouchableOpacity>
@@ -57,13 +59,13 @@ export function DateTabs({ selectedMonth, selectedDate, onDateChange }: DateTabs
                     return (
                         <TouchableOpacity
                             key={index}
-                            style={[styles.dayTab, isSelected && styles.selectedDayTab]}
+                            style={[styles.dayTab, { backgroundColor: isDarkMode ? "rgba(255, 255, 255, 0.05)" : "rgba(0,0,0, 0.05)" }, isSelected && styles.selectedDayTab]}
                             onPress={() => onDateChange(date)}
                         >
-                            <Text style={[styles.dayName, isSelected && styles.selectedDayText]}>
+                            <Text style={[styles.dayName, { color: theme.textSecondary }, isSelected && styles.selectedDayText]}>
                                 {date.toLocaleString("default", { weekday: "short" })}
                             </Text>
-                            <Text style={[styles.dayNumber, isSelected && styles.selectedDayText]}>
+                            <Text style={[styles.dayNumber, { color: theme.text }, isSelected && styles.selectedDayText]}>
                                 {date.getDate()}
                             </Text>
                             {isToday && <View style={styles.dot} />}

@@ -1,3 +1,4 @@
+import { useTheme } from "@/context/ThemeContext";
 import { StyleSheet, Text, TextInput, TextInputProps, View } from "react-native";
 
 interface InputProps extends TextInputProps {
@@ -6,13 +7,14 @@ interface InputProps extends TextInputProps {
 }
 
 export function Input({ label, style, icon, ...props }: InputProps) {
+    const { theme } = useTheme();
     return (
         <View style={styles.inputContainer}>
-            <Text style={styles.label}>{label}</Text>
+            <Text style={[styles.label, { color: theme.text }]}>{label}</Text>
             <View style={styles.inputWrapper}>
                 <TextInput
-                    style={[styles.textInput, style]}
-                    placeholderTextColor="#A0A0A5"
+                    style={[styles.textInput, { backgroundColor: theme.inputBackground, borderColor: theme.border, color: theme.text }, style]}
+                    placeholderTextColor={theme.textSecondary}
                     {...props}
                 />
                 {icon && icon}

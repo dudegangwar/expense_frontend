@@ -3,6 +3,7 @@ import { router, Stack } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { useEffect } from "react";
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { ThemeProvider } from '../context/ThemeContext';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -31,9 +32,11 @@ export default function RootLayout() {
   }, []);
   return (
     <SafeAreaProvider>
-      <QueryClientProvider client={queryClient}>
-        <Stack screenOptions={{ headerShown: false }} />
-      </QueryClientProvider>
+      <ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+          <Stack screenOptions={{ headerShown: false }} />
+        </QueryClientProvider>
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 }

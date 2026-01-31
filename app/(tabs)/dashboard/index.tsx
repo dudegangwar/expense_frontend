@@ -1,5 +1,6 @@
 import { TransactionListSkeleton } from "@/components/skeleton/TransactionList";
 import { SummaryCard } from "@/components/SummaryCard";
+import { useTheme } from "@/context/ThemeContext";
 import { ActionButtons } from "@/features/dashboard/ActionButtons";
 import { TransactionList } from "@/features/transactions/TransactionList";
 import api from "@/lib/api/api";
@@ -10,6 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 
 export default function DashboardScreen() {
+  const { theme, isDarkMode } = useTheme();
   const [transactions, setTransactions] = useState<IExpenses[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [refreshing, setRefreshing] = useState<boolean>(false);
@@ -86,8 +88,8 @@ export default function DashboardScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#0B0D12" />
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+      <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} backgroundColor={theme.background} />
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -101,8 +103,8 @@ export default function DashboardScreen() {
         }
       >
         <View style={styles.header}>
-          <Text style={styles.appName}>Xpen</Text>
-          <Text style={styles.date}>{new Date().toLocaleDateString()}</Text>
+          <Text style={[styles.appName, { color: theme.text }]}>Xpen</Text>
+          <Text style={[styles.date, { color: theme.textSecondary }]}>{new Date().toLocaleDateString()}</Text>
         </View>
 
         <SummaryCard

@@ -1,3 +1,4 @@
+import { useTheme } from "@/context/ThemeContext";
 import { useTransactionStore } from "@/store/transaction";
 import React from "react";
 
@@ -12,12 +13,15 @@ import { TypeToggle as TransactionTypeToggle } from "../features/transactions/Tr
 
 export default function AddTransactionScreen() {
   const insets = useSafeAreaInsets();
+  const { theme } = useTheme();
   const { expenseType, setExpenseType } = useTransactionStore();
 
   return (
 
     <View style={{
-      ...styles.container, paddingTop: insets.top,
+      ...styles.container,
+      backgroundColor: theme.background,
+      paddingTop: insets.top,
       paddingBottom: insets.bottom,
       paddingLeft: insets.left + 20,
       paddingRight: insets.right + 20,

@@ -1,3 +1,4 @@
+import { useTheme } from "@/context/ThemeContext";
 import { StyleSheet, Text, View } from "react-native";
 import { PieChart } from "react-native-gifted-charts";
 
@@ -20,11 +21,12 @@ export function CategoryAnalysis({ data }: { data: ChartData[] }) {
     );
   }
 
+  const { theme } = useTheme();
   // Find the largest segment to display in center or just display total
   const maxSegment = data.reduce((prev, current) => (prev.value > current.value) ? prev : current);
 
   return (
-    <View style={styles.chartCard}>
+    <View style={[styles.chartCard, { backgroundColor: theme.cardBackground }]}>
       <View style={styles.pieRow}>
         <View style={styles.chartContainer}>
           <PieChart
@@ -36,7 +38,7 @@ export function CategoryAnalysis({ data }: { data: ChartData[] }) {
             }}
             radius={100}
             strokeWidth={2}
-            strokeColor="#15171E"
+            strokeColor={theme.cardBackground}
             showText
             textColor="white"
             textSize={12}
@@ -45,16 +47,16 @@ export function CategoryAnalysis({ data }: { data: ChartData[] }) {
         </View>
 
         <View style={styles.legend}>
-          <Text style={styles.legendTitle}>Categories</Text>
+          <Text style={[styles.legendTitle, { color: theme.text }]}>Categories</Text>
 
           {data.map((item) => (
-            <View key={item.name || item.text} style={styles.legendItem}>
+            <View key={item.name || item.text} style={[styles.legendItem, { backgroundColor: theme.iconBackground, borderColor: theme.border }]}>
               <View
                 style={[styles.legendDot, { backgroundColor: item.color }]}
               />
               <View>
-                <Text style={styles.legendText}>{item.name || item.text}</Text>
-                <Text style={styles.legendValue}>{item.value.toFixed(1)}%</Text>
+                <Text style={[styles.legendText, { color: theme.text }]}>{item.name || item.text}</Text>
+                <Text style={[styles.legendValue, { color: theme.textSecondary }]}>{item.value.toFixed(1)}%</Text>
               </View>
             </View>
           ))}

@@ -1,4 +1,5 @@
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { useTheme } from "@/context/ThemeContext";
 import { StyleSheet, Text, View } from "react-native";
 
 interface TransactionItemProps {
@@ -13,17 +14,18 @@ interface TransactionItemProps {
 }
 
 function TransactionItem({ title, subtitle, amount, color = "#2C2C35", icon = "creditcard.fill", expense_type }: TransactionItemProps) {
+  const { theme, isDarkMode } = useTheme();
   const isNegative = expense_type === "expense"
   return (
-    <View style={styles.transaction}>
+    <View style={[styles.transaction, { backgroundColor: theme.cardBackground, borderColor: theme.border }]}>
       <View style={[styles.iconContainer, { backgroundColor: color }]}>
         {/* @ts-ignore */}
         <IconSymbol name={expense_type === "expense" ? "creditcard.fill" : "creditcard.fill"} size={20} color={"#5E60CE"} />
       </View>
 
       <View style={styles.transactionInfo}>
-        <Text style={styles.transactionTitle}>{title}</Text>
-        {subtitle && <Text style={styles.transactionSubtitle}>{subtitle}</Text>}
+        <Text style={[styles.transactionTitle, { color: theme.text }]}>{title}</Text>
+        {subtitle && <Text style={[styles.transactionSubtitle, { color: theme.textSecondary }]}>{subtitle}</Text>}
       </View>
 
       <View style={styles.transactionRight}>

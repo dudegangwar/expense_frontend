@@ -1,5 +1,5 @@
+import { useTheme } from "@/context/ThemeContext";
 import api, { Category, getCategories } from "@/lib/api/api";
-import { IExpenses } from "@/types";
 import React, { useEffect, useMemo, useState } from "react";
 import { Alert, ScrollView, StatusBar, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -23,6 +23,7 @@ const formatAmount = (amount: number) => {
 };
 
 export default function AnalysisScreen() {
+  const { theme, isDarkMode } = useTheme();
   const [selectedMonth, setSelectedMonth] = useState(new Date());
   const [activeView, setActiveView] = useState<'categories' | 'trends'>('categories');
   const [transactions, setTransactions] = useState<IExpenses[]>([]);
@@ -164,8 +165,8 @@ export default function AnalysisScreen() {
   }, [transactions]);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#0B0D12" />
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+      <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} backgroundColor={theme.background} />
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <AnalysisHeader />
 

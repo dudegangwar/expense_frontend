@@ -1,3 +1,4 @@
+import { useTheme } from "@/context/ThemeContext";
 import { Dimensions, StyleSheet, Text, View } from "react-native";
 import { CurveType, LineChart } from "react-native-gifted-charts";
 
@@ -8,13 +9,14 @@ interface TrendsData {
 }
 
 export function WeeklyAnalysis({ incomeData, expenseData }: { incomeData: TrendsData[], expenseData: TrendsData[] }) {
+  const { theme } = useTheme();
   const hasData = (incomeData && incomeData.length > 0) || (expenseData && expenseData.length > 0);
 
   if (!hasData) {
     return (
-      <View style={styles.chartCard}>
-        <Text style={styles.cardTitle}>Trends</Text>
-        <Text style={{ color: '#A0A0A5', textAlign: 'center', paddingVertical: 20 }}>No data available</Text>
+      <View style={[styles.chartCard, { backgroundColor: theme.cardBackground }]}>
+        <Text style={[styles.cardTitle, { color: theme.text }]}>Trends</Text>
+        <Text style={{ color: theme.textSecondary, textAlign: 'center', paddingVertical: 20 }}>No data available</Text>
       </View>
     );
   }
@@ -32,8 +34,8 @@ export function WeeklyAnalysis({ incomeData, expenseData }: { incomeData: Trends
   const chartWidth = screenWidth - 80; // 40 padding horizontal + 40 card padding
 
   return (
-    <View style={styles.chartCard}>
-      <Text style={styles.cardTitle}>Trends</Text>
+    <View style={[styles.chartCard, { backgroundColor: theme.cardBackground }]}>
+      <Text style={[styles.cardTitle, { color: theme.text }]}>Trends</Text>
 
       <LineChart
         data={incomeData}
@@ -56,9 +58,9 @@ export function WeeklyAnalysis({ incomeData, expenseData }: { incomeData: Trends
         initialSpacing={20}
         yAxisColor="transparent"
         xAxisColor="transparent"
-        yAxisTextStyle={{ color: "#A0A0A5", fontSize: 10 }}
-        xAxisLabelTextStyle={{ color: "#A0A0A5", fontSize: 10 }}
-        rulesColor="#2A2C35"
+        yAxisTextStyle={{ color: theme.textSecondary, fontSize: 10 }}
+        xAxisLabelTextStyle={{ color: theme.textSecondary, fontSize: 10 }}
+        rulesColor={theme.border}
         noOfSections={4}
         rulesType="solid"
         dataPointsColor="#4CAF50"

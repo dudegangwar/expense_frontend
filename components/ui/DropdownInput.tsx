@@ -1,4 +1,5 @@
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { useTheme } from '@/context/ThemeContext';
 import React, { useState } from 'react';
 import { FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -17,6 +18,7 @@ interface DropdownInputProps {
 }
 
 export function DropdownInput({ label, value, options, onSelect, placeholder = "Select option" }: DropdownInputProps) {
+    const { theme } = useTheme();
     const [visible, setVisible] = useState(false);
 
     const selectedOption = options.find(opt => opt.value === value);
@@ -28,12 +30,12 @@ export function DropdownInput({ label, value, options, onSelect, placeholder = "
 
     return (
         <View style={styles.container}>
-            <Text style={styles.label}>{label}</Text>
-            <TouchableOpacity style={styles.trigger} onPress={() => setVisible(true)}>
-                <Text style={[styles.valueText, !selectedOption && styles.placeholder]}>
+            <Text style={[styles.label, { color: theme.text }]}>{label}</Text>
+            <TouchableOpacity style={[styles.trigger, { backgroundColor: theme.inputBackground, borderColor: theme.border }]} onPress={() => setVisible(true)}>
+                <Text style={[styles.valueText, { color: theme.text }, !selectedOption && { color: theme.textSecondary }]}>
                     {selectedOption ? selectedOption.label : placeholder}
                 </Text>
-                <IconSymbol name="chevron.down" size={16} color="#A0A0A5" />
+                <IconSymbol name="chevron.down" size={16} color={theme.textSecondary} />
             </TouchableOpacity>
 
             <Modal
@@ -43,8 +45,8 @@ export function DropdownInput({ label, value, options, onSelect, placeholder = "
                 onRequestClose={() => setVisible(false)}
             >
                 <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={() => setVisible(false)}>
-                    <View style={styles.modalContent}>
-                        <Text style={styles.modalTitle}>Select {label}</Text>
+                    <View style={[styles.modalContent, { backgroundColor: theme.cardBackground }]}>
+                        <Text style={[styles.modalTitle, { color: theme.text }]}>Select {label}</Text>
                         <FlatList
                             data={options}
                             keyExtractor={(item) => item.value}
@@ -60,11 +62,12 @@ export function DropdownInput({ label, value, options, onSelect, placeholder = "
                                         {item.icon && (
                                             <View style={styles.iconContainer}>
                                                 {/* @ts-ignore */}
-                                                <IconSymbol name={item.icon} size={20} color={item.value === value ? "#fff" : "#A0A0A5"} />
+                                                <IconSymbol name={item.icon} size={20} color={item.value === value ? "#fff" : theme.textSecondary} />
                                             </View>
                                         )}
                                         <Text style={[
                                             styles.optionText,
+                                            { color: theme.text },
                                             item.value === value && styles.selectedOptionText
                                         ]}>
                                             {item.label}

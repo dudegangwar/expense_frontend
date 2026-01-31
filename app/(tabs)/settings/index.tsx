@@ -1,22 +1,12 @@
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { useTheme } from '@/context/ThemeContext';
 import { EditProfileModal } from '@/features/settings/EditProfileModal';
+import { exportToCSV, exportToExcel } from '@/lib/exportData';
 import { router, useFocusEffect } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import React, { useCallback, useState } from 'react';
 import { ActivityIndicator, Alert, Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
 import api from '../../../lib/api/api';
-
-// Theme Constants matching the screenshot
-const THEME = {
-    background: '#0B0D12', // Very dark background
-    cardBackground: '#15171E', // Slightly lighter card background
-    text: '#FFFFFF',
-    textSecondary: '#A0A0A5',
-    accent: '#5E60CE', // Purple for toggles
-    iconBackground: '#1E2029', // Dark gray/blue for icon containers
-    danger: '#FF453A', // Red for delete
-    dangerBackground: '#2C1517', // Dark red bg for delete icon
-};
 
 interface SettingItemProps {
     icon: string;
@@ -29,20 +19,25 @@ interface SettingItemProps {
     onValueChange?: (val: boolean) => void;
     onPress?: () => void;
     destructive?: boolean;
+    theme: any;
 }
 
 function SettingItem({
     icon,
-    iconColor = '#818CF8',
-    iconBackgroundColor = THEME.iconBackground,
+    iconColor,
+    iconBackgroundColor,
     title,
     subtitle,
     type = 'link',
     value,
     onValueChange,
     onPress,
-    destructive = false
+    destructive = false,
+    theme
 }: SettingItemProps) {
+    const activeIconColor = iconColor || '#818CF8';
+    const activeIconBg = iconBackgroundColor || theme.iconBackground;
+
     return (
         <TouchableOpacity
             style={styles.itemContainer}
@@ -50,24 +45,24 @@ function SettingItem({
             activeOpacity={type !== 'toggle' ? 0.7 : 1}
             disabled={type === 'toggle'}
         >
-            <View style={[styles.iconContainer, { backgroundColor: destructive ? THEME.dangerBackground : iconBackgroundColor }]}>
+            <View style={[styles.iconContainer, { backgroundColor: destructive ? theme.dangerBackground : activeIconBg }]}>
                 {/* @ts-ignore: Symbol mappings are handled in IconSymbol */}
                 <IconSymbol
                     name={icon as any}
                     size={22}
-                    color={destructive ? THEME.danger : iconColor}
+                    color={destructive ? theme.danger : activeIconColor}
                 />
             </View>
 
             <View style={styles.textContainer}>
-                <Text style={[styles.itemTitle, destructive && { color: THEME.danger }]}>{title}</Text>
-                {subtitle && <Text style={styles.itemSubtitle}>{subtitle}</Text>}
+                <Text style={[styles.itemTitle, { color: theme.text }, destructive && { color: theme.danger }]}>{title}</Text>
+                {subtitle && <Text style={[styles.itemSubtitle, { color: theme.textSecondary }]}>{subtitle}</Text>}
             </View>
 
             <View style={styles.actionContainer}>
                 {type === 'toggle' && (
                     <Switch
-                        trackColor={{ false: '#3e3e3e', true: THEME.accent }}
+                        trackColor={{ false: '#3e3e3e', true: theme.accent }}
                         thumbColor={'#fff'}
                         ios_backgroundColor="#3e3e3e"
                         onValueChange={onValueChange}
@@ -78,7 +73,7 @@ function SettingItem({
                     <IconSymbol
                         name="chevron.right"
                         size={20}
-                        color={THEME.textSecondary}
+                        color={theme.textSecondary}
                     />
                 )}
             </View>
@@ -86,11 +81,11 @@ function SettingItem({
     );
 }
 
-function SettingSection({ title, children }: { title: string, children: React.ReactNode }) {
+function SettingSection({ title, children, theme }: { title: string, children: React.ReactNode, theme: any }) {
     return (
         <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{title}</Text>
-            <View style={styles.card}>
+            <Text style={[styles.sectionTitle, { color: theme.text }]}>{title}</Text>
+            <View style={[styles.card, { backgroundColor: theme.cardBackground }]}>
                 {children}
             </View>
         </View>
@@ -98,7 +93,7 @@ function SettingSection({ title, children }: { title: string, children: React.Re
 }
 
 export default function SettingsScreen() {
-    const [darkMode, setDarkMode] = useState(true);
+    const { theme, isDarkMode, toggleTheme } = useTheme();
     const [notifications, setNotifications] = useState(true);
 
     // User State
@@ -113,8 +108,6 @@ export default function SettingsScreen() {
             setUser(res.data);
         } catch (error) {
             console.log('Error fetching user:', error);
-            // Optionally handle 401 logout if needed, but interceptor might handle it ? 
-            // Currently simple log.
         } finally {
             setLoading(false);
         }
@@ -162,48 +155,87 @@ export default function SettingsScreen() {
         );
     };
 
+    const handleExportData = () => {
+        Alert.alert(
+            "Export Data",
+            "Choose a format to export your data",
+            [
+                {
+                    text: "Excel",
+                    onPress: async () => {
+                        try {
+                            setLoading(true);
+                            const res = await api.get('/expenses');
+                            await exportToExcel(res.data, `expenses_${new Date().toISOString().split('T')[0]}`);
+                        } catch (error) {
+                            Alert.alert("Error", "Failed to export data");
+                        } finally {
+                            setLoading(false);
+                        }
+                    }
+                },
+                {
+                    text: "CSV",
+                    onPress: async () => {
+                        try {
+                            setLoading(true);
+                            const res = await api.get('/expenses');
+                            await exportToCSV(res.data, `expenses_${new Date().toISOString().split('T')[0]}`);
+                        } catch (error) {
+                            Alert.alert("Error", "Failed to export data");
+                        } finally {
+                            setLoading(false);
+                        }
+                    }
+                },
+                { text: "Cancel", style: "cancel" }
+            ]
+        );
+    };
+
     return (
-        <SafeAreaView style={styles.container}>
-            <StatusBar barStyle="light-content" backgroundColor={THEME.background} />
+        <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+            <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} backgroundColor={theme.background} />
             <View style={styles.header}>
-                <Text style={styles.headerTitle}>Settings</Text>
+                <Text style={[styles.headerTitle, { color: theme.text }]}>Settings</Text>
             </View>
 
             <ScrollView contentContainerStyle={styles.scrollContent}>
 
                 {/* Profile Card */}
-                <View style={styles.profileCard}>
+                <View style={[styles.profileCard, { backgroundColor: theme.cardBackground }]}>
                     <View style={styles.profileHeader}>
                         <View style={styles.avatarContainer}>
                             {/* @ts-ignore */}
-                            <IconSymbol name="person.circle.fill" size={48} color={THEME.accent} />
+                            <IconSymbol name="person.circle.fill" size={48} color={theme.accent} />
                         </View>
                         <View style={styles.profileInfo}>
                             {loading && !user ? (
-                                <ActivityIndicator color={THEME.accent} />
+                                <ActivityIndicator color={theme.accent} />
                             ) : (
                                 <>
-                                    <Text style={styles.profileName}>{user?.name || 'User'}</Text>
-                                    <Text style={styles.profileEmail}>{user?.email || 'email@example.com'}</Text>
+                                    <Text style={[styles.profileName, { color: theme.text }]}>{user?.name || 'User'}</Text>
+                                    <Text style={[styles.profileEmail, { color: theme.textSecondary }]}>{user?.email || 'email@example.com'}</Text>
                                 </>
                             )}
                         </View>
-                        <TouchableOpacity style={styles.editButton} onPress={() => setModalVisible(true)}>
-                            <Text style={styles.editButtonText}>Edit</Text>
+                        <TouchableOpacity style={[styles.editButton, { backgroundColor: theme.iconBackground, borderColor: theme.border }]} onPress={() => setModalVisible(true)}>
+                            <Text style={[styles.editButtonText, { color: theme.accent }]}>Edit</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
 
-                <SettingSection title="Appearance">
+                <SettingSection title="Appearance" theme={theme}>
                     <SettingItem
                         icon="moon.fill"
                         title="Dark Mode"
                         subtitle="Switch between light and dark theme"
                         type="toggle"
-                        value={darkMode}
-                        onValueChange={setDarkMode}
+                        value={isDarkMode}
+                        onValueChange={toggleTheme}
+                        theme={theme}
                     />
-                    <View style={styles.separator} />
+                    <View style={[styles.separator, { backgroundColor: theme.border }]} />
                     <SettingItem
                         icon="bell.fill"
                         title="Notifications"
@@ -211,44 +243,41 @@ export default function SettingsScreen() {
                         type="toggle"
                         value={notifications}
                         onValueChange={setNotifications}
+                        theme={theme}
                     />
                 </SettingSection>
 
-                <SettingSection title="Budget & Categories">
-                    <SettingItem
-                        icon="creditcard.fill"
-                        title="Budget"
-                        subtitle="Set your monthly budget"
-                        type="link"
-                        onPress={() => router.push('/budget')}
-                    />
-                    <View style={styles.separator} />
+                <SettingSection title="Budget & Categories" theme={theme}>
+
                     <SettingItem
                         icon="square.grid.2x2.fill"
                         title="Manage Categories"
                         subtitle="Add, edit, or delete categories"
                         type="link"
                         onPress={() => { }}
+                        theme={theme}
                     />
-                    <View style={styles.separator} />
+                    <View style={[styles.separator, { backgroundColor: theme.border }]} />
                     <SettingItem
                         icon="briefcase.fill"
                         title="Income Sources"
                         subtitle="Manage your income sources"
                         type="link"
                         onPress={() => { }}
+                        theme={theme}
                     />
                 </SettingSection>
 
-                <SettingSection title="Data Management">
+                <SettingSection title="Data Management" theme={theme}>
                     <SettingItem
                         icon="arrow.down.doc.fill"
                         title="Export Data"
                         subtitle="Export your data as PDF or Excel"
                         type="link"
-                        onPress={() => { }}
+                        onPress={handleExportData}
+                        theme={theme}
                     />
-                    <View style={styles.separator} />
+                    <View style={[styles.separator, { backgroundColor: theme.border }]} />
                     <SettingItem
                         icon="trash.fill"
                         title="Clear All Data"
@@ -256,10 +285,11 @@ export default function SettingsScreen() {
                         type="action"
                         destructive
                         onPress={() => { }}
+                        theme={theme}
                     />
                 </SettingSection>
 
-                <SettingSection title="Account">
+                <SettingSection title="Account" theme={theme}>
                     <SettingItem
                         icon="arrow.right.circle.fill"
                         title="Log Out"
@@ -270,8 +300,9 @@ export default function SettingsScreen() {
                             await SecureStore.deleteItemAsync('token');
                             router.replace('/');
                         }}
+                        theme={theme}
                     />
-                    <View style={styles.separator} />
+                    <View style={[styles.separator, { backgroundColor: theme.border }]} />
                     <SettingItem
                         icon="trash.fill"
                         title="Delete Account"
@@ -279,12 +310,13 @@ export default function SettingsScreen() {
                         type="action"
                         destructive
                         onPress={handleDeleteAccount}
+                        theme={theme}
                     />
                 </SettingSection>
 
-                <View style={styles.infoCard}>
-                    <Text style={styles.infoTitle}>Xpen</Text>
-                    <Text style={styles.infoSubtitle}>Easy-Track Expenses & Budget with Powerful Analysis</Text>
+                <View style={[styles.infoCard, { backgroundColor: isDarkMode ? '#1C202F' : '#E5E5EA' }]}>
+                    <Text style={[styles.infoTitle, { color: theme.text }]}>Xpen</Text>
+                    <Text style={[styles.infoSubtitle, { color: theme.textSecondary }]}>Easy-Track Expenses & Budget with Powerful Analysis</Text>
                 </View>
 
                 <View style={{ height: 40 }} />
@@ -299,6 +331,7 @@ export default function SettingsScreen() {
                     phone_number: user?.phone_number || ''
                 }}
                 onSave={handleUpdateUser}
+                theme={theme}
             />
         </SafeAreaView>
     );
@@ -307,7 +340,6 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: THEME.background,
     },
     header: {
         paddingHorizontal: 20,
@@ -317,7 +349,6 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 32,
         fontWeight: '700',
-        color: THEME.text,
         fontFamily: Platform.select({ ios: 'System', android: 'sans-serif-medium' }),
     },
     scrollContent: {
@@ -325,7 +356,6 @@ const styles = StyleSheet.create({
         paddingBottom: 40,
     },
     profileCard: {
-        backgroundColor: THEME.cardBackground,
         borderRadius: 16,
         padding: 20,
         marginBottom: 24,
@@ -343,23 +373,18 @@ const styles = StyleSheet.create({
     profileName: {
         fontSize: 18,
         fontWeight: '700',
-        color: THEME.text,
         marginBottom: 4,
     },
     profileEmail: {
         fontSize: 14,
-        color: THEME.textSecondary,
     },
     editButton: {
-        backgroundColor: '#1E2029',
         paddingHorizontal: 16,
         paddingVertical: 8,
         borderRadius: 8,
         borderWidth: 1,
-        borderColor: '#2A2C35',
     },
     editButtonText: {
-        color: THEME.accent,
         fontWeight: '600',
         fontSize: 14,
     },
@@ -369,12 +394,10 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 18,
         fontWeight: '600',
-        color: THEME.text,
         marginBottom: 12,
         marginTop: 8,
     },
     card: {
-        backgroundColor: THEME.cardBackground,
         borderRadius: 16,
         paddingVertical: 4,
         overflow: 'hidden',
@@ -398,12 +421,10 @@ const styles = StyleSheet.create({
     itemTitle: {
         fontSize: 16,
         fontWeight: '600',
-        color: THEME.text,
         marginBottom: 4,
     },
     itemSubtitle: {
         fontSize: 13,
-        color: THEME.textSecondary,
         lineHeight: 18,
     },
     actionContainer: {
@@ -411,11 +432,9 @@ const styles = StyleSheet.create({
     },
     separator: {
         height: 1,
-        backgroundColor: '#2A2C35', // Subtle separator
         marginLeft: 72, // Align with text start
     },
     infoCard: {
-        backgroundColor: '#1C202F', // Slightly different shade
         borderRadius: 16,
         padding: 24,
         alignItems: 'center',
@@ -423,13 +442,11 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     infoTitle: {
-        color: '#E0E0E0',
         fontSize: 16,
         fontWeight: '600',
         marginBottom: 8,
     },
     infoSubtitle: {
-        color: '#8A8F98',
         fontSize: 14,
         textAlign: 'center',
     },

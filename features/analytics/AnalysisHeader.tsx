@@ -1,10 +1,12 @@
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { useTheme } from "@/context/ThemeContext";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 function Header() {
+  const { theme } = useTheme();
   return (
     <View style={styles.header}>
-      <Text style={styles.headerTitle}>Analysis</Text>
+      <Text style={[styles.headerTitle, { color: theme.text }]}>Analysis</Text>
 
       <TouchableOpacity style={styles.exportButton}>
         {/* @ts-ignore */}

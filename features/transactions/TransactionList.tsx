@@ -1,4 +1,5 @@
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { useTheme } from "@/context/ThemeContext";
 import { IExpenses } from "@/types";
 import React, { useState } from "react";
 import { LayoutAnimation, Platform, StyleSheet, Text, TouchableOpacity, UIManager, View } from "react-native";
@@ -18,6 +19,7 @@ function TransactionGroup({
   day: string;
   group: any;
 }) {
+  const { theme } = useTheme();
   const [isExpanded, setIsExpanded] = useState(true);
   const rotate = useSharedValue(0);
 
@@ -49,9 +51,9 @@ function TransactionGroup({
               color="#5E60CE"
             />
           </Animated.View>
-          <Text style={styles.dayText}>{day}</Text>
+          <Text style={[styles.dayText, { color: theme.text }]}>{day}</Text>
         </View>
-        <Text style={styles.countText}>{group?.transactions?.length} Transactions</Text>
+        <Text style={[styles.countText, { color: theme.textSecondary }]}>{group?.transactions?.length} Transactions</Text>
       </TouchableOpacity>
 
       {isExpanded && group.transactions.map((transaction: any) => (

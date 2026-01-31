@@ -1,16 +1,24 @@
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { useTheme } from "@/context/ThemeContext";
 import { StyleSheet, Text, View } from "react-native";
-
-function SummaryItem({ title, amount, icon, color, isFullWidth = false }: { title: string; amount: string; icon: string; color: string; isFullWidth?: boolean }) {
+interface SummaryItemProps {
+    title: string;
+    amount: string;
+    icon: string;
+    color: string;
+    isFullWidth?: boolean;
+    theme: any;
+}
+function SummaryItem({ title, amount, icon, color, isFullWidth = false, theme }: SummaryItemProps) {
     return (
-        <View style={[styles.card, isFullWidth && styles.fullWidth]}>
+        <View style={[styles.card, { backgroundColor: theme.cardBackground, borderColor: theme.border }, isFullWidth && styles.fullWidth]}>
             <View style={[styles.iconContainer, { backgroundColor: `${color}20` }]}>
                 {/* @ts-ignore */}
                 <IconSymbol name={icon} size={20} color={color} />
             </View>
             <View style={styles.content}>
-                <Text style={styles.title}>{title}</Text>
-                <Text style={styles.amount}>{amount}</Text>
+                <Text style={[styles.title, { color: theme.textSecondary }]}>{title}</Text>
+                <Text style={[styles.amount, { color: theme.text }]}>{amount}</Text>
             </View>
         </View>
     );
@@ -23,6 +31,7 @@ interface AnalysisSummaryProps {
 }
 
 export function AnalysisSummary({ income, expense, transactionCount }: AnalysisSummaryProps) {
+    const { theme } = useTheme();
     return (
         <View style={styles.container}>
             <View style={styles.row}>
@@ -32,6 +41,7 @@ export function AnalysisSummary({ income, expense, transactionCount }: AnalysisS
                         amount={income.toFixed(2)}
                         icon="arrow.up.right"
                         color="#4CAF50"
+                        theme={theme}
                     />
                 </View>
                 <View style={{ width: 12 }} />
@@ -41,6 +51,7 @@ export function AnalysisSummary({ income, expense, transactionCount }: AnalysisS
                         amount={Math.abs(expense).toFixed(2)}
                         icon="arrow.down.right"
                         color="#FD3C4A"
+                        theme={theme}
                     />
                 </View>
             </View>
@@ -51,6 +62,7 @@ export function AnalysisSummary({ income, expense, transactionCount }: AnalysisS
                 icon="doc.text.fill"
                 color="#2196F3"
                 isFullWidth
+                theme={theme}
             />
         </View>
     );

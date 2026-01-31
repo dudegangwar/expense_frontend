@@ -1,21 +1,29 @@
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { useTheme } from "@/context/ThemeContext";
 import { StyleSheet, Text, View } from "react-native";
-
-function CategoryItem({ title, percentage, amount, icon, color }: { title: string; percentage: string; amount: string; icon: string; color: string }) {
+interface CategoryItemProps {
+    title: string;
+    percentage: string;
+    amount: string;
+    icon: string;
+    color: string;
+    theme: any;
+}
+function CategoryItem({ title, percentage, amount, icon, color, theme }: CategoryItemProps) {
     return (
-        <View style={styles.item}>
+        <View style={[styles.item, { backgroundColor: theme.cardBackground, borderColor: theme.border }]}>
             <View style={[styles.iconContainer, { backgroundColor: `${color}15` }]}>
                 {/* @ts-ignore */}
                 <IconSymbol name={icon} size={20} color={color} />
             </View>
             <View style={styles.content}>
-                <Text style={styles.title}>{title}</Text>
-                <Text style={styles.percentage}>{percentage}</Text>
+                <Text style={[styles.title, { color: theme.text }]}>{title}</Text>
+                <Text style={[styles.percentage, { color: theme.textSecondary }]}>{percentage}</Text>
             </View>
             <View style={styles.right}>
-                <Text style={styles.amount}>{amount}</Text>
+                <Text style={[styles.amount, { color: theme.text }]}>{amount}</Text>
                 {/* @ts-ignore */}
-                <IconSymbol name="chevron.right" size={16} color="#A0A0A5" />
+                <IconSymbol name="chevron.right" size={16} color={theme.textSecondary} />
             </View>
         </View>
     );
@@ -30,9 +38,10 @@ interface CategoryBreakdownItem {
 }
 
 export function CategoryBreakdown({ categories }: { categories: CategoryBreakdownItem[] }) {
+    const { theme } = useTheme();
     return (
         <View style={styles.container}>
-            <Text style={styles.headerTitle}>Category Breakdown</Text>
+            <Text style={[styles.headerTitle, { color: theme.text }]}>Category Breakdown</Text>
 
             {categories.map((item, index) => (
                 <View key={index} style={{ marginBottom: 8 }}>
@@ -42,6 +51,7 @@ export function CategoryBreakdown({ categories }: { categories: CategoryBreakdow
                         amount={item.amount}
                         icon={item.icon}
                         color={item.color}
+                        theme={theme}
                     />
                 </View>
             ))}

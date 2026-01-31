@@ -1,5 +1,6 @@
 import { TransactionListSkeleton } from "@/components/skeleton/TransactionList";
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { useTheme } from "@/context/ThemeContext";
 import { DateTabs } from "@/features/transactions/DateTabs";
 import { FilterBar } from "@/features/transactions/FilterBar";
 import { MonthSelector } from "@/features/transactions/MonthSelector";
@@ -22,6 +23,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function TransactionsScreen() {
+  const { theme, isDarkMode } = useTheme();
   const [transactions, setTransactions] = useState<IExpenses[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -115,13 +117,13 @@ export default function TransactionsScreen() {
   });
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#0B0D12" />
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+      <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} backgroundColor={theme.background} />
 
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Transactions</Text>
+        <Text style={[styles.headerTitle, { color: theme.text }]}>Transactions</Text>
         <TouchableOpacity
-          style={styles.addButton}
+          style={[styles.addButton, { backgroundColor: theme.cardBackground, borderColor: theme.border }]}
           onPress={() => router.push("/add")}
         >
           {/* @ts-ignore */}

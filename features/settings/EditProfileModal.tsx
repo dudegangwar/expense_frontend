@@ -22,9 +22,10 @@ interface EditProfileModalProps {
         phone_number: string;
     };
     onSave: (data: { name: string; email: string; phone_number: string }) => Promise<void>;
+    theme: any;
 }
 
-export function EditProfileModal({ visible, onClose, initialData, onSave }: EditProfileModalProps) {
+export function EditProfileModal({ visible, onClose, initialData, onSave, theme }: EditProfileModalProps) {
     const [fullName, setFullName] = useState(initialData.name);
     const [email, setEmail] = useState(initialData.email);
     const [phoneNumber, setPhoneNumber] = useState(initialData.phone_number);
@@ -62,9 +63,9 @@ export function EditProfileModal({ visible, onClose, initialData, onSave }: Edit
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
                 style={styles.centeredView}
             >
-                <View style={styles.modalView}>
+                <View style={[styles.modalView, { backgroundColor: theme.cardBackground }]}>
                     <View style={styles.header}>
-                        <Text style={styles.modalText}>Edit Profile</Text>
+                        <Text style={[styles.modalText, { color: theme.text }]}>Edit Profile</Text>
                         <TouchableOpacity onPress={onClose} style={styles.closeButton}>
                             {/* @ts-ignore */}
                             <IconSymbol name="xmark.circle.fill" size={24} color="#A0A0A5" />
@@ -73,37 +74,37 @@ export function EditProfileModal({ visible, onClose, initialData, onSave }: Edit
 
                     <ScrollView style={styles.form}>
                         <View style={styles.inputGroup}>
-                            <Text style={styles.label}>Full Name</Text>
+                            <Text style={[styles.label, { color: theme.textSecondary }]}>Full Name</Text>
                             <TextInput
-                                style={styles.input}
+                                style={[styles.input, { backgroundColor: theme.inputBackground, borderColor: theme.border, color: theme.text }]}
                                 value={fullName}
                                 onChangeText={setFullName}
                                 placeholder="Enter full name"
-                                placeholderTextColor="#555"
+                                placeholderTextColor={theme.textSecondary}
                             />
                         </View>
 
                         <View style={styles.inputGroup}>
-                            <Text style={styles.label}>Email</Text>
+                            <Text style={[styles.label, { color: theme.textSecondary }]}>Email</Text>
                             <TextInput
-                                style={styles.input}
+                                style={[styles.input, { backgroundColor: theme.inputBackground, borderColor: theme.border, color: theme.text }]}
                                 value={email}
                                 onChangeText={setEmail}
                                 placeholder="Enter email"
-                                placeholderTextColor="#555"
+                                placeholderTextColor={theme.textSecondary}
                                 keyboardType="email-address"
                                 autoCapitalize="none"
                             />
                         </View>
 
                         <View style={styles.inputGroup}>
-                            <Text style={styles.label}>Phone Number</Text>
+                            <Text style={[styles.label, { color: theme.textSecondary }]}>Phone Number</Text>
                             <TextInput
-                                style={styles.input}
+                                style={[styles.input, { backgroundColor: theme.inputBackground, borderColor: theme.border, color: theme.text }]}
                                 value={phoneNumber}
                                 onChangeText={setPhoneNumber}
                                 placeholder="Enter phone number"
-                                placeholderTextColor="#555"
+                                placeholderTextColor={theme.textSecondary}
                                 keyboardType="phone-pad"
                             />
                         </View>
@@ -111,7 +112,7 @@ export function EditProfileModal({ visible, onClose, initialData, onSave }: Edit
 
                     <View style={styles.activeButtonContainer}>
                         <TouchableOpacity
-                            style={styles.saveButton}
+                            style={[styles.saveButton, { backgroundColor: theme.accent }]}
                             onPress={handleSave}
                             disabled={loading}
                         >

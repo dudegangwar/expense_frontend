@@ -1,3 +1,4 @@
+import { useTheme } from "@/context/ThemeContext";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
 interface ToggleProps {
@@ -13,17 +14,20 @@ export function Toggle({
     active,
     onPress,
     activeColor = "#4CAF50", // Default active color
-    inactiveColor = "#1E2029" // Default inactive color
+    inactiveColor
 }: ToggleProps) {
+    const { theme } = useTheme();
+    const resolvedInactiveColor = inactiveColor || theme.iconBackground;
+
     return (
         <TouchableOpacity
             onPress={onPress}
             style={[
                 styles.toggleButton,
-                { backgroundColor: active ? activeColor : inactiveColor },
+                { backgroundColor: active ? activeColor : resolvedInactiveColor },
             ]}
         >
-            <Text style={[styles.toggleText, active && { color: "#fff" }]}>
+            <Text style={[styles.toggleText, { color: theme.textSecondary }, active && { color: "#fff" }]}>
                 {label}
             </Text>
         </TouchableOpacity>

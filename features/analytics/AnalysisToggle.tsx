@@ -1,4 +1,5 @@
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { useTheme } from "@/context/ThemeContext";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface AnalysisToggleProps {
@@ -7,8 +8,9 @@ interface AnalysisToggleProps {
 }
 
 export function AnalysisToggle({ activeView, onToggle }: AnalysisToggleProps) {
+    const { theme } = useTheme();
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: theme.cardBackground }]}>
             <TouchableOpacity
                 style={activeView === 'categories' ? styles.tabActive : styles.tabInactive}
                 onPress={() => onToggle('categories')}
@@ -17,9 +19,9 @@ export function AnalysisToggle({ activeView, onToggle }: AnalysisToggleProps) {
                 <IconSymbol
                     name="chart.pie.fill"
                     size={16}
-                    color={activeView === 'categories' ? "#fff" : "#A0A0A5"}
+                    color={activeView === 'categories' ? "#fff" : theme.textSecondary}
                 />
-                <Text style={activeView === 'categories' ? styles.textActive : styles.textInactive}>
+                <Text style={activeView === 'categories' ? styles.textActive : [styles.textInactive, { color: theme.textSecondary }]}>
                     Categories
                 </Text>
             </TouchableOpacity>
@@ -32,9 +34,9 @@ export function AnalysisToggle({ activeView, onToggle }: AnalysisToggleProps) {
                 <IconSymbol
                     name="chart.line.uptrend.xyaxis"
                     size={16}
-                    color={activeView === 'trends' ? "#fff" : "#A0A0A5"}
+                    color={activeView === 'trends' ? "#fff" : theme.textSecondary}
                 />
-                <Text style={activeView === 'trends' ? styles.textActive : styles.textInactive}>
+                <Text style={activeView === 'trends' ? styles.textActive : [styles.textInactive, { color: theme.textSecondary }]}>
                     Trends
                 </Text>
             </TouchableOpacity>
